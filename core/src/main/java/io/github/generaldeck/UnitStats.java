@@ -1,4 +1,4 @@
-package io.github.gameprototipo;
+package io.github.generaldeck;
 
 public class UnitStats {
     // Stats dos Arqueiros

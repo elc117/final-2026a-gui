@@ -1,4 +1,4 @@
-package io.github.gameprototipo;
+package io.github.generaldeck;
 
 import com.badlogic.gdx.Gdx;
 
