@@ -8,6 +8,5 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 **O que foi feito:**
 * Geração do esqueleto do projeto utilizando `gdx-liftoff`, garantindo a separação entre os módulos `core`, `desktop` (lwjgl3) e `html`.
 * Configuração da classe principal herdeira de `Game` para gerenciamento de estados.
-* Criação da abstração `BaseScreen` para encapsular a lógica da câmera e do redimensionamento.
-* Implementação do `FitViewport` (1920x1080) para garantir que o campo de batalha mantenha a proporção correta e não sofra distorções quando renderizado no navegador via Itch.io.
-* Criação dos protótipos iniciais das telas de Preparação (`PreparationScreen`) e Combate (`CombatScreen`) com posicionamento preliminar da grid de batalha.
+* Implementação do `FitViewport` (1280x720) para garantir que o campo de batalha mantenha a proporção correta e não sofra distorções quando renderizado no navegador via Itch.io.
+* Criação dos protótipos iniciais das telas de Menu (`MainMenuScreen`), Preparação (`PreparationScreen`) e Combate (`CombatScreen`) com posicionamento preliminar da grid de batalha.
