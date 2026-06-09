@@ -10,19 +10,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /** First screen of the application. Displayed after the application is created. */
-public class MainMenuScreen extends ScreenAdapter {
+public class MainMenuScreen extends BaseScreen {
 
-    private final Game game;
+    private final Main game;
     private final Stage stage;
     private final FitViewport viewport;
 
     // Skin é o repositório central de estilos e recursos da UI
     // vamos criar um arquivo depois que vai funcionar como se fosse um stylesheet CSS
     // para ditar o estilo dos botões do jogo
-    public MainMenuScreen(Game game, Skin skin) {
+    public MainMenuScreen(Main game, Skin skin) {
+        super(game);
         this.game = game;
 
         // resolução base interna do jogo, FitViewport adiciona barras pretas
@@ -48,7 +50,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
                 PreparationScreen prepScreen = new PreparationScreen(game, skin, gridManager);
 
-                ((Main)game).changeScreen(prepScreen);
+                game.changeScreen(prepScreen);
             }
         });
 
@@ -81,8 +83,7 @@ public class MainMenuScreen extends ScreenAdapter {
     public void render(float delta) {
         // "delta" é o tempo desde o ultimo render
         // é usado para que a velocidade seja sempre a mesma independente do FPS
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        super.render(delta);
 
         stage.act(delta);
         stage.draw();
