@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import org.w3c.dom.Text;
 
 public class PreparationScreen extends BaseScreen {
     private final Stage stage;
@@ -97,17 +98,11 @@ public class PreparationScreen extends BaseScreen {
         rootTable.add(gridTable).expand().center().row();
         rootTable.add(paletteTable).padBottom(GameConfig.PAD_DEFAULT).bottom();
 
-        TextButton startButton = new TextButton("Iniciar Combate", skin);
-
-        startButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("Preparation", "Iniciando combate! Extraindo dados do Grid...");
-
-                String[][] finalFormation = gridManager.getGridState();
-
-                game.changeScreen(new CombatScreen(game, finalFormation));
-            }
+        // BOTÃO "INICIAR COMBATE"
+        TextButton startButton = UIFactory.createButton("Iniciar Combate", skin, () -> {
+            Gdx.app.log("Preparation", "Iniciando combate! Extraindo dados do Grid...");
+            String[][] finalFormation = gridManager.getGridState();
+            game.changeScreen(new CombatScreen(game, finalFormation));
         });
 
         rootTable.add(startButton).padTop(GameConfig.PAD_DEFAULT).padBottom(GameConfig.PAD_DEFAULT).row();

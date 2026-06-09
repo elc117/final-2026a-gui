@@ -36,31 +36,6 @@ public class MainMenuScreen extends BaseScreen {
         table.setFillParent(true);
         this.stage.addActor(table);
 
-
-        // botões placeholder para as outras telas
-        TextButton campaignButton = new TextButton("Campaign", skin);
-        TextButton multiplayerButton = new TextButton("Multiplayer", skin);
-
-        campaignButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("MainMenu", "Transition to Campaign");
-
-                GridManager gridManager = new GridManager(GameConfig.GRID_COLS, GameConfig.GRID_ROWS);
-
-                PreparationScreen prepScreen = new PreparationScreen(game, skin, gridManager);
-
-                game.changeScreen(prepScreen);
-            }
-        });
-
-        multiplayerButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("MainMenu", "Transition to Multiplayer");
-            }
-        });
-
         // table é um gerenciador de layout dinamico, como se fosse uma tabela mesmo e ai só dizer em que
         // coluna e linha queremos o botão/elemento
         table.defaults()
@@ -68,8 +43,19 @@ public class MainMenuScreen extends BaseScreen {
             .height(GameConfig.BUTTON_HEIGHT)
             .padBottom(GameConfig.PAD_DEFAULT);
 
+        // BOTÃO "CAMPAIGN"
+        TextButton campaignButton = UIFactory.createButton("Campaign", skin, () -> {
+            Gdx.app.log("MainMenu", "Transition to Campaign");
+            GridManager gridManager = new GridManager(GameConfig.GRID_COLS, GameConfig.GRID_ROWS);
+            PreparationScreen prepScreen = new PreparationScreen(game, skin, gridManager);
+            game.changeScreen(prepScreen);
+        });
         table.add(campaignButton).row();
 
+        // BOTÃO "MULTIPLAYER"
+        TextButton multiplayerButton = UIFactory.createButton("Multiplayer", skin, () -> {
+            Gdx.app.log("MainMenu", "Transition to Multiplayer");
+        });
         table.add(multiplayerButton).padBottom(0).row();
 
     }
