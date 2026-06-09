@@ -16,14 +16,16 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class PreparationScreen extends ScreenAdapter {
+public class PreparationScreen extends BaseScreen {
     private final Stage stage;
     // o Scene2D tem um sistema de Drag-and-Drop nativo
     private final DragAndDrop dragAndDrop;
     private final GridManager gridManager;
     private final Skin skin;
 
-    public PreparationScreen(Game game, Skin skin, GridManager gridManager) {
+    public PreparationScreen(Main game, Skin skin, GridManager gridManager) {
+        super(game);
+
         this.stage = new Stage(new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT));
         this.dragAndDrop = new DragAndDrop();
         this.gridManager = gridManager;
@@ -104,9 +106,7 @@ public class PreparationScreen extends ScreenAdapter {
 
                 String[][] finalFormation = gridManager.getGridState();
 
-                Main mainGame = (Main) game;
-
-                mainGame.changeScreen(new CombatScreen(mainGame, finalFormation));
+                game.changeScreen(new CombatScreen(game, finalFormation));
             }
         });
 
@@ -143,8 +143,7 @@ public class PreparationScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0.3f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        super.render(delta);
 
         stage.act(delta);
         stage.draw();

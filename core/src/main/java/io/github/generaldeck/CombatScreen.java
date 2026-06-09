@@ -7,12 +7,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-public class CombatScreen extends ScreenAdapter {
+public class CombatScreen extends BaseScreen {
     private final FitViewport viewport;
     private final ShapeRenderer shapeRenderer;
     private final BattalionManager battalionManager;
 
-    public CombatScreen(Game game, String[][] gridState) {
+    public CombatScreen(Main game, String[][] gridState) {
+        super(game);
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
 
         this.shapeRenderer = new ShapeRenderer();
@@ -58,8 +59,7 @@ public class CombatScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.1f, 0.3f, 0.1f, 1); // Um fundo verde-escuro (grama)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        super.render(delta);
 
         viewport.apply(); // Aplica as transformações de câmera
 
