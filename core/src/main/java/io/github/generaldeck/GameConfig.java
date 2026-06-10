@@ -11,11 +11,11 @@ public class GameConfig {
     // padrões de UI
     public static final float BUTTON_WIDTH = 250f;
     public static final float BUTTON_HEIGHT = 50f;
-    public static final float PAD_DEFAULT = 20f;
+    public static final float PAD_DEFAULT = 10f;
     public static final float PAD_SMALL = 10f;
 
     // tamanho do grid
-    public static final int TILE_SIZE = 64;
+    public static final int TILE_SIZE = 55;
     public static final int GRID_COLS = 10;
     public static final int GRID_ROWS = 10;
     public static final float UNIT_ICON_SIZE = 64f;

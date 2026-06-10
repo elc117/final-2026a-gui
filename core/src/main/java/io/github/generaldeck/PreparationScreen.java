@@ -58,7 +58,11 @@ public class PreparationScreen extends BaseScreen {
                 dragAndDrop.addTarget(new DragAndDrop.Target(cell) {
                     @Override
                     public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                        // verificação se o gridManager diz que a célula está ocupada vai aqui
+                        String[][] gridState = gridManager.getGridState();
+                        if(gridState[cellX][cellY] != null) {
+                            Gdx.app.log("Erro", "Já existe uma tropa posicionada aqui");
+                            return false;
+                        }
                         return true;
                     }
 
