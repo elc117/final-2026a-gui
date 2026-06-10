@@ -1,6 +1,10 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/8MfjtJ-y)
+/![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/8MfjtJ-y)
 
 # Auto-Battler (Trabalho Final)
+
+### Coisas para fazer:
+* Resolver bug de acesso fora da matriz: na PreparationScreen, jogo crasha quando insere tropa nas linhas do topo.
+
 
 ## Progresso 08/06 (Setup e Telas)
 Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisitos de ambiente e as diretrizes de visualização para a web.
@@ -10,3 +14,8 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Configuração da classe principal herdeira de `Game` para gerenciamento de estados.
 * Implementação do `FitViewport` (1280x720) para garantir que o campo de batalha mantenha a proporção correta e não sofra distorções quando renderizado no navegador via Itch.io.
 * Criação dos protótipos iniciais das telas de Menu (`MainMenuScreen`), Preparação (`PreparationScreen`) e Combate (`CombatScreen`) com posicionamento preliminar da grid de batalha.
+
+## Progresso 09/06
+**O que foi feito:**
+* Criação de uma classe abstrata `BaseScreen` para implementar as outras screens
+* Criação da classe UIFactory para facilitar a criação de botões
