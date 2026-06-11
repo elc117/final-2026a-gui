@@ -1,7 +1,7 @@
 package io.github.generaldeck;
 
 public class UnitStats {
-    public static final UnitProfile ARCHER = new UnitProfile(UnitClass.RANGED, 100f, 25f, 150f, 80f);
+    public static final UnitProfile ARCHER = new UnitProfile(UnitClass.RANGED, 100f, 25f, 500f, 80f);
     public static final UnitProfile WARRIOR = new UnitProfile(UnitClass.MELEE, 250f, 40f, 20f, 60f);
 
     private UnitStats() {

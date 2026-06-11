@@ -56,8 +56,12 @@ public class BattalionManager {
                     break;
             }
 
+            applySeparationMath(unit);
+
             unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
+            unit.position.x = Math.clamp(unit.position.x, 0f, GameConfig.V_WIDTH);
             unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
+            unit.position.y = Math.clamp(unit.position.y, 0f, GameConfig.V_HEIGHT);
 
             if(unit.isDead) {
                 activeUnits.removeIndex(i);
@@ -146,6 +150,48 @@ public class BattalionManager {
         return lowestHpUnit != null ? lowestHpUnit : findClosestEnemy(seeker); // Fallback caso haja empate/erro
     }
 
+    private void applySeparationMath(Unit unit) {
+        float pushX = 0;
+        float pushY = 0;
+
+        // Espaço pessoal da unidade (ex: 20 pixels de raio).
+        // Se as suas bolinhas têm raio 8, 16 a 20 é um bom valor.
+        float separationRadius = 20f;
+        float separationForce = 5f; // O quão forte elas se empurram (ajuste a gosto)
+
+        for (int i = 0; i < activeUnits.size; i++) {
+            Unit other = activeUnits.get(i);
+
+            // Não faz sentido separarmo-nos de nós próprios!
+            if (unit == other) continue;
+
+            float dx = unit.position.x - other.position.x;
+            float dy = unit.position.y - other.position.y;
+
+            float distSq = dx * dx + dy * dy;
+
+            // Se o 'other' estiver dentro do nosso espaço pessoal...
+            if (distSq > 0 && distSq < (separationRadius * separationRadius)) {
+                float distance = (float) Math.sqrt(distSq);
+
+                // Quanto mais perto, maior a sobreposição e mais forte é o empurrão!
+                float overlap = separationRadius - distance;
+
+                // Normaliza o vetor de repulsão
+                dx /= distance;
+                dy /= distance;
+
+                // Acumula a força de empurrão
+                pushX += dx * overlap;
+                pushY += dy * overlap;
+            }
+        }
+
+        // Adiciona a força acumulada de repulsão à velocidade atual da unidade
+        unit.velocity.x += pushX * separationForce;
+        unit.velocity.y += pushY * separationForce;
+    }
+
     public void render(ShapeRenderer shapeRenderer) {
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
@@ -153,6 +199,7 @@ public class BattalionManager {
             // No futuro, teremos um atributo 'team' (0 = Aliado, 1 = Inimigo).
             // Por agora, pintamos de Verde os Arqueiros (longo alcance) e Vermelho os Guerreiros.
             if (unit.attackRange > 50f) {
+                unit.currentBehavior = UnitBehavior.FLEE;
                 shapeRenderer.setColor(Color.GREEN);
             } else {
                 shapeRenderer.setColor(Color.RED);

@@ -40,7 +40,7 @@ public class CombatScreen extends BaseScreen {
                     float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
 
                     // SPAWNA AS UNIDADES
-                    spawnSquad(unitType, worldX, worldY, 60);
+                    spawnSquad(unitType, worldX, worldY, 50);
                 }
             }
         }
@@ -51,7 +51,7 @@ public class CombatScreen extends BaseScreen {
             // Adiciona uma pequena variação (jitter) para as unidades não nascerem exatamente em cima da outra
             float jitterX = (float) (Math.random() * 100 - 20);
             float jitterY = (float) (Math.random() * 100 - 20);
-
+            
             // O Pool entra em ação: Zero alocação de 'new Unit()' no Heap!
             battalionManager.spawnUnit(type, centerX + jitterX, centerY + jitterY);
         }
