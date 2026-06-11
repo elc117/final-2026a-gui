@@ -45,7 +45,7 @@ public class PreparationScreen extends BaseScreen {
         int cols = gridManager.getCols();
         int rows = gridManager.getRows();
 
-        for(int y = rows; y >= 0; y--) {
+        for(int y = rows - 1; y >= 0; y--) {
             for(int x = 0; x < cols; x++) {
                 final int cellX = x;
                 final int cellY = y;
