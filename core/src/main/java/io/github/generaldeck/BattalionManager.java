@@ -20,9 +20,9 @@ public class BattalionManager {
         Unit unit = unitPool.obtain();
 
         if ("ARCHER".equals(type)) {
-            unit.setToArcher(x, y);
+            unit.setToArcher(1, x, y);
         } else {
-            unit.setToWarrior(x, y);
+            unit.setToWarrior(0, x, y);
         }
 
         activeUnits.add(unit);
@@ -32,14 +32,118 @@ public class BattalionManager {
         for(int i = activeUnits.size - 1; i >= 0; i--) {
             Unit unit = activeUnits.get(i);
 
-            // Lógica de IA
-            // updatePosition
+            if(unit.effectTimer > 0) {
+                unit.effectTimer -= delta;
+                if(unit.effectTimer <= 0) {
+                    unit.currentBehavior = UnitBehavior.SEEK_CLOSEST;
+                    unit.speedMultiplier = 1.0f;
+                }
+            }
+
+            // MÁQUINA DE ESTADOS
+            switch (unit.currentBehavior) {
+                case SEEK_CLOSEST:
+                    applySeekMath(unit, findClosestEnemy(unit));
+                    break;
+                case SEEK_LOWEST_HP:
+                    applySeekMath(unit, findLowestHpEnemy(unit));
+                    break;
+                case FLEE:
+                    applyFleeMath(unit, findClosestEnemy(unit));
+                    break;
+                case STUNNED:
+                    unit.velocity.setZero();
+                    break;
+            }
+
+            unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
+            unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
 
             if(unit.isDead) {
                 activeUnits.removeIndex(i);
                 unitPool.free(unit);
             }
         }
+    }
+
+    private Unit findClosestEnemy(Unit seeker) {
+        Unit closest = null;
+        float minDistanceSq = Float.MAX_VALUE;
+
+        for (int i = 0; i < activeUnits.size; i++) {
+            Unit other = activeUnits.get(i);
+
+            // Ignorar aliados e ignorar a si próprio
+            if (other.team == seeker.team) continue;
+
+            // Distância em X e Y
+            float dx = other.position.x - seeker.position.x;
+            float dy = other.position.y - seeker.position.y;
+
+            // Distância ao quadrado (Mais rápido que fazer Math.sqrt)
+            float distSq = dx * dx + dy * dy;
+
+            if (distSq < minDistanceSq) {
+                minDistanceSq = distSq;
+                closest = other;
+            }
+        }
+        return closest;
+    }
+
+    private void applySeekMath(Unit seeker, Unit target) {
+        if (target == null) {
+            seeker.velocity.setZero();
+            return;
+        }
+
+        float dirX = target.position.x - seeker.position.x;
+        float dirY = target.position.y - seeker.position.y;
+        float distance = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+
+        if (distance > seeker.attackRange) {
+            dirX /= distance;
+            dirY /= distance;
+            seeker.velocity.x = dirX * seeker.moveSpeed;
+            seeker.velocity.y = dirY * seeker.moveSpeed;
+        } else {
+            seeker.velocity.setZero();
+        }
+    }
+
+    private void applyFleeMath(Unit fleer, Unit threat) {
+        if (threat == null) {
+            fleer.velocity.setZero();
+            return;
+        }
+
+        float dirX = fleer.position.x - threat.position.x;
+        float dirY = fleer.position.y - threat.position.y;
+        float distance = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+
+        if (distance > 0) {
+            dirX /= distance;
+            dirY /= distance;
+            fleer.velocity.x = dirX * fleer.moveSpeed;
+            fleer.velocity.y = dirY * fleer.moveSpeed;
+        }
+    }
+
+    private Unit findLowestHpEnemy(Unit seeker) {
+        Unit lowestHpUnit = null;
+        float minHp = Float.MAX_VALUE;
+
+        for (int i = 0; i < activeUnits.size; i++) {
+            Unit other = activeUnits.get(i);
+
+            if (other.team == seeker.team) continue; // Ignora aliados
+
+            if (other.currentHp < minHp) {
+                minHp = other.currentHp;
+                lowestHpUnit = other;
+            }
+        }
+        return lowestHpUnit != null ? lowestHpUnit : findClosestEnemy(seeker); // Fallback caso haja empate/erro
     }
 
     public void render(ShapeRenderer shapeRenderer) {

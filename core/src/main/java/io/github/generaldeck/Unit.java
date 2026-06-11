@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class Unit implements Poolable {
-    public enum UnitClass { MELEE, RANGED, MAGIC }
     public UnitClass unitClass;
     public int team; // 0 para jogador, 1 para inimigo
 
@@ -15,40 +14,36 @@ public class Unit implements Poolable {
     public float attackRange;
     public float moveSpeed;
 
+    public float speedMultiplier = 1.0f;
+    public float effectTimer = 0f;
+
     public final Vector2 position = new Vector2();
     public final Vector2 velocity = new Vector2();
 
     public boolean isDead;
 
-    public void init(UnitClass uClass, int team, float x, float y, float maxHp, float damage, float range, float speed) {
-        this.unitClass = uClass;
+    public UnitBehavior currentBehavior = UnitBehavior.SEEK_CLOSEST;
+
+    public void init(UnitProfile profile, int team, float x, float y) {
+        this.unitClass = profile.uClass;
+        this.maxHp = profile.maxHp;
+        this.currentHp = profile.maxHp;
+        this.damage = profile.damage;
+        this.attackRange = profile.range;
+        this.moveSpeed = profile.speed;
+
         this.team = team;
         this.position.set(x, y);
         this.velocity.setZero();
-
-        this.maxHp = maxHp;
-        this.currentHp = maxHp;
-        this.damage = damage;
-        this.attackRange = range;
-        this.moveSpeed = speed;
-
         this.isDead = false;
     }
 
-    public void setToArcher(float x, float y) {
-        this.init(UnitClass.RANGED, 0, x, y,
-            UnitStats.ARCHER_HP,
-            UnitStats.ARCHER_DAMAGE,
-            UnitStats.ARCHER_RANGE,
-            UnitStats.ARCHER_SPEED);
+    public void setToArcher(int team, float x, float y) {
+        this.init(UnitStats.ARCHER, team, x, y);
     }
 
-    public void setToWarrior(float x, float y) {
-        this.init(UnitClass.MELEE, 0, x, y,
-            UnitStats.WARRIOR_HP,
-            UnitStats.WARRIOR_DAMAGE,
-            UnitStats.WARRIOR_RANGE,
-            UnitStats.WARRIOR_SPEED);
+    public void setToWarrior(int team, float x, float y) {
+        this.init(UnitStats.WARRIOR, team, x, y);
     }
 
     @Override
