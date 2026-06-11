@@ -19,3 +19,7 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 **O que foi feito:**
 * Criação de uma classe abstrata `BaseScreen` para implementar as outras screens
 * Criação da classe UIFactory para facilitar a criação de botões
+
+## Progresso 11/06
+**O que foi feito:**
+* Correção do bug de acesso fora da matriz em PreparationScreen.java.
