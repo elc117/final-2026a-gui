@@ -1,17 +1,8 @@
 package io.github.generaldeck;
 
 public class UnitStats {
-    // Stats dos Arqueiros
-    public static final float ARCHER_HP = 100f;
-    public static final float ARCHER_DAMAGE = 10f;
-    public static final float ARCHER_RANGE = 200f;
-    public static final float ARCHER_SPEED = 5f;
-
-    // Stats dos Guerreiros
-    public static final float WARRIOR_HP = 200f;
-    public static final float WARRIOR_DAMAGE = 15f;
-    public static final float WARRIOR_RANGE = 30f;
-    public static final float WARRIOR_SPEED = 3f;
+    public static final UnitProfile ARCHER = new UnitProfile(UnitClass.RANGED, 100f, 25f, 500f, 80f);
+    public static final UnitProfile WARRIOR = new UnitProfile(UnitClass.MELEE, 250f, 40f, 20f, 60f);
 
     private UnitStats() {
         throw new UnsupportedOperationException("Esta classe não deve ser instaciada. " +
