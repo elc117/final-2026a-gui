@@ -58,10 +58,11 @@ public class BattalionManager {
 
             applySeparationMath(unit);
 
-            unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
-            unit.position.x = Math.clamp(unit.position.x, 0f, GameConfig.V_WIDTH);
-            unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
-            unit.position.y = Math.clamp(unit.position.y, 0f, GameConfig.V_HEIGHT);
+            if(unit.position.x > 1 && unit.position.x < GameConfig.V_WIDTH
+                && unit.position.y > 1 && unit.position.y < GameConfig.V_HEIGHT) {
+                unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
+                unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
+            }
 
             if(unit.isDead) {
                 activeUnits.removeIndex(i);
@@ -199,7 +200,6 @@ public class BattalionManager {
             // No futuro, teremos um atributo 'team' (0 = Aliado, 1 = Inimigo).
             // Por agora, pintamos de Verde os Arqueiros (longo alcance) e Vermelho os Guerreiros.
             if (unit.attackRange > 50f) {
-                unit.currentBehavior = UnitBehavior.FLEE;
                 shapeRenderer.setColor(Color.GREEN);
             } else {
                 shapeRenderer.setColor(Color.RED);
