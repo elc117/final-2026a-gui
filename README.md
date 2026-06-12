@@ -3,10 +3,10 @@
 # Auto-Battler (Trabalho Final)
 
 ### Coisas para fazer:
-* Resolver bug de acesso fora da matriz: na PreparationScreen, jogo crasha quando insere tropa nas linhas do topo.
+* (Resolvido) Resolver bug de acesso fora da matriz: na PreparationScreen, jogo crasha quando insere tropa nas linhas do topo.
 
 
-## Progresso 08/06 (Setup e Telas)
+## Progresso 08/06
 Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisitos de ambiente e as diretrizes de visualização para a web.
 
 **O que foi feito:**
@@ -19,3 +19,7 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 **O que foi feito:**
 * Criação de uma classe abstrata `BaseScreen` para implementar as outras screens
 * Criação da classe UIFactory para facilitar a criação de botões
+
+## Progresso 11/06
+**O que foi feito:**
+* Correção do bug de acesso fora da matriz em PreparationScreen.java.
