@@ -1,5 +1,6 @@
 package io.github.generaldeck;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.graphics.Color;
@@ -32,6 +33,16 @@ public class BattalionManager {
         for(int i = activeUnits.size - 1; i >= 0; i--) {
             Unit unit = activeUnits.get(i);
 
+            if(unit.isDead) {
+                activeUnits.removeIndex(i);
+                unitPool.free(unit);
+                continue;
+            }
+
+            if(unit.attackTimer > 0) {
+                unit.attackTimer -= delta;
+            }
+
             if(unit.effectTimer > 0) {
                 unit.effectTimer -= delta;
                 if(unit.effectTimer <= 0) {
@@ -58,16 +69,11 @@ public class BattalionManager {
 
             applySeparationMath(unit);
 
-            if(unit.position.x > 1 && unit.position.x < GameConfig.V_WIDTH
-                && unit.position.y > 1 && unit.position.y < GameConfig.V_HEIGHT) {
-                unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
-                unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
-            }
+            unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
+            unit.position.x = MathUtils.clamp(unit.position.x, 0f, GameConfig.V_WIDTH);
+            unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
+            unit.position.y = MathUtils.clamp(unit.position.y, 0f, GameConfig.V_HEIGHT);
 
-            if(unit.isDead) {
-                activeUnits.removeIndex(i);
-                unitPool.free(unit);
-            }
         }
     }
 
@@ -113,6 +119,16 @@ public class BattalionManager {
             seeker.velocity.y = dirY * seeker.moveSpeed;
         } else {
             seeker.velocity.setZero();
+
+            if (seeker.attackTimer <= 0) {
+                target.currentHp -= seeker.damage;
+                seeker.attackTimer = seeker.attackCooldown;
+
+                if (target.currentHp <= 0) {
+                    target.currentHp = 0;
+                    target.isDead = true;
+                }
+            }
         }
     }
 
@@ -200,8 +216,11 @@ public class BattalionManager {
             // No futuro, teremos um atributo 'team' (0 = Aliado, 1 = Inimigo).
             // Por agora, pintamos de Verde os Arqueiros (longo alcance) e Vermelho os Guerreiros.
             if (unit.attackRange > 50f) {
+                unit.currentBehavior = UnitBehavior.FLEE;
+                unit.team = 1;
                 shapeRenderer.setColor(Color.GREEN);
             } else {
+                unit.team = 0;
                 shapeRenderer.setColor(Color.RED);
             }
 

@@ -20,6 +20,15 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Criação de uma classe abstrata `BaseScreen` para implementar as outras screens
 * Criação da classe UIFactory para facilitar a criação de botões
 
+## Progresso 10/06
+**O que foi feito:**
+* Spawn das unidades na tela `PreparationScreen`
+* Tela de combate renderizando um protótipo das unidades
+* Bugfix para não por unidades no mesmo grid
+
 ## Progresso 11/06
 **O que foi feito:**
 * Correção do bug de acesso fora da matriz em PreparationScreen.java.
+* Comportamento de flocking baseado em Craig Reynolds
+* Comportamento de seek modular para facilitar o desenvolvimento depois
+* Optamos por não utilizar mais o `gdx-ai` para deixar o jogo o mais leve possível

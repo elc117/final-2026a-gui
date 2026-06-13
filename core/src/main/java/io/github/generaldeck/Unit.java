@@ -17,6 +17,9 @@ public class Unit implements Poolable {
     public float speedMultiplier = 1.0f;
     public float effectTimer = 0f;
 
+    public float attackCooldown;
+    public float attackTimer = 0f;
+
     public final Vector2 position = new Vector2();
     public final Vector2 velocity = new Vector2();
 
@@ -31,6 +34,7 @@ public class Unit implements Poolable {
         this.damage = profile.damage;
         this.attackRange = profile.range;
         this.moveSpeed = profile.speed;
+        this.attackCooldown = profile.attackCooldown;
 
         this.team = team;
         this.position.set(x, y);
@@ -52,6 +56,7 @@ public class Unit implements Poolable {
         this.position.setZero();
         this.velocity.setZero();
         this.currentHp = 0;
-        this.isDead = true;
+        this.attackTimer = 0;
+        this.isDead = false;
     }
 }
