@@ -15,15 +15,15 @@ public class BattalionManager {
         }
     };
 
-    private final Array<Unit> activeUnits = new Array<>(512);
+    private final Array<Unit> activeUnits = new Array<>(1024);
 
-    public void spawnUnit(String type, float x, float y) {
+    public void spawnUnit(String type, float x, float y, int team) {
         Unit unit = unitPool.obtain();
 
         if ("ARCHER".equals(type)) {
-            unit.setToArcher(1, x, y);
+            unit.setToArcher(team, x, y);
         } else {
-            unit.setToWarrior(0, x, y);
+            unit.setToWarrior(team, x, y);
         }
 
         activeUnits.add(unit);
@@ -70,10 +70,12 @@ public class BattalionManager {
             applySeparationMath(unit);
 
             unit.position.x += unit.velocity.x * unit.speedMultiplier * delta;
-            unit.position.x = MathUtils.clamp(unit.position.x, 0f, GameConfig.V_WIDTH);
-            unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
-            unit.position.y = MathUtils.clamp(unit.position.y, 0f, GameConfig.V_HEIGHT);
+            unit.position.x = MathUtils.clamp(unit.position.x, GameConfig.UNIT_DRAW_SIZE,
+                GameConfig.V_WIDTH - GameConfig.UNIT_DRAW_SIZE);
 
+            unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
+            unit.position.y = MathUtils.clamp(unit.position.y, GameConfig.UNIT_DRAW_SIZE,
+                GameConfig.V_HEIGHT - GameConfig.UNIT_DRAW_SIZE);
         }
     }
 
@@ -85,7 +87,7 @@ public class BattalionManager {
             Unit other = activeUnits.get(i);
 
             // Ignorar aliados e ignorar a si próprio
-            if (other.team == seeker.team) continue;
+            if (other.isDead || other.team == seeker.team) continue;
 
             // Distância em X e Y
             float dx = other.position.x - seeker.position.x;
@@ -172,9 +174,8 @@ public class BattalionManager {
         float pushY = 0;
 
         // Espaço pessoal da unidade (ex: 20 pixels de raio).
-        // Se as suas bolinhas têm raio 8, 16 a 20 é um bom valor.
         float separationRadius = 20f;
-        float separationForce = 5f; // O quão forte elas se empurram (ajuste a gosto)
+        float separationForce = 10f; // O quão forte elas se empurram
 
         for (int i = 0; i < activeUnits.size; i++) {
             Unit other = activeUnits.get(i);
@@ -209,24 +210,73 @@ public class BattalionManager {
         unit.velocity.y += pushY * separationForce;
     }
 
+    public void spawnArmies(String[][] playerGrid, String[][] enemyGrid) {
+        int cols = playerGrid.length;
+        int rows = playerGrid[0].length;
+
+        float gridPixelWidth = cols * GameConfig.TILE_SIZE;
+        float gridPixelHeight = rows * GameConfig.TILE_SIZE;
+
+        float startY = (GameConfig.V_HEIGHT - gridPixelHeight) / 2f;
+
+        float screenMargin = GameConfig.V_WIDTH * 0.1f;
+
+        // spawna o JOGADOR (lado esquerdo, não espelhado, time 0)
+        float playerStartX = screenMargin;
+        parseGridAndSpawnUnits(playerGrid, playerStartX, startY, 0, false);
+
+        // spawna o INIMIGO (lado direito, espelhado, time 1)
+        float enemyStartX = GameConfig.V_WIDTH - screenMargin - gridPixelWidth;
+        parseGridAndSpawnUnits(enemyGrid, enemyStartX, startY, 1, true);
+    }
+
+    private void parseGridAndSpawnUnits(String[][] gridState, float startX, float startY, int team, boolean isMirrored) {
+        int cols = gridState.length;
+        int rows = gridState[0].length;
+
+        for (int x = 0; x < cols; x++) {
+            for (int y = 0; y < rows; y++) {
+                String unitType = gridState[x][y];
+
+                if (unitType != null) {
+                    // lógica de espelhamento
+                    int effectiveX = isMirrored ? (cols - 1 - x) : x;
+
+                    // Converte a Coordenada da Matriz [X, Y] para Pixels no Mundo
+                    float worldX = startX + (effectiveX * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
+                    float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
+
+                    // SPAWNA AS UNIDADES
+                    spawnSquad(unitType, worldX, worldY, 50, team);
+                }
+            }
+        }
+    }
+
+    private void spawnSquad(String type, float centerX, float centerY, int count, int team) {
+        for (int i = 0; i < count; i++) {
+            // Adiciona uma pequena variação (jitter) para as unidades não nascerem exatamente em cima da outra
+            float jitterX = (float) (Math.random() * 100 - 20);
+            float jitterY = (float) (Math.random() * 100 - 20);
+
+            // O Pool entra em ação: Zero alocação de 'new Unit()' no Heap!
+            spawnUnit(type, centerX + jitterX, centerY + jitterY, team);
+        }
+    }
+
     public void render(ShapeRenderer shapeRenderer) {
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
 
-            // No futuro, teremos um atributo 'team' (0 = Aliado, 1 = Inimigo).
-            // Por agora, pintamos de Verde os Arqueiros (longo alcance) e Vermelho os Guerreiros.
-            if (unit.attackRange > 50f) {
-                unit.currentBehavior = UnitBehavior.FLEE;
-                unit.team = 1;
+            if (unit.team == 0) {
                 shapeRenderer.setColor(Color.GREEN);
             } else {
-                unit.team = 0;
                 shapeRenderer.setColor(Color.RED);
             }
 
             // Desenha a unidade como um círculo sólido de raio 8 pixels
             // Acesso direto aos atributos públicos, sem métodos getPosition()
-            shapeRenderer.circle(unit.position.x, unit.position.y, 8f);
+            shapeRenderer.circle(unit.position.x, unit.position.y, GameConfig.UNIT_DRAW_SIZE);
         }
     }
 }
