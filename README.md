@@ -4,7 +4,10 @@
 
 ### Coisas para fazer:
 * (Resolvido) Resolver bug de acesso fora da matriz: na PreparationScreen, jogo crasha quando insere tropa nas linhas do topo.
-
+* Tem um bug que crasha o jogo caso o grid do GameConfig não seja um quadrado.
+* Começar a pensar em gráficos e spritesheets dos personagens
+* Começar a pensar nas cartas de habilidade
+* Refatorar códigos que não estão muito claros
 
 ## Progresso 08/06
 Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisitos de ambiente e as diretrizes de visualização para a web.
@@ -31,4 +34,9 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Correção do bug de acesso fora da matriz em PreparationScreen.java.
 * Comportamento de flocking baseado em Craig Reynolds
 * Comportamento de seek modular para facilitar o desenvolvimento depois
-* Optamos por não utilizar mais o `gdx-ai` para deixar o jogo o mais leve possível
+
+## Progresso 13/06
+**O que foi feito:**
+* Refatoração de alguns códigos muito feios
+* Criação de um sistema de seleção de níveis e criação de inimigos
+* `LevelManager`, `SelectLevelScreen`

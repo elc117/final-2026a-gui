@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 /** First screen of the application. Displayed after the application is created. */
 public class MainMenuScreen extends BaseScreen {
 
-    private final Main game;
     private final Stage stage;
     private final FitViewport viewport;
 
@@ -25,7 +24,6 @@ public class MainMenuScreen extends BaseScreen {
     // para ditar o estilo dos botões do jogo
     public MainMenuScreen(Main game, Skin skin) {
         super(game);
-        this.game = game;
 
         // resolução base interna do jogo, FitViewport adiciona barras pretas
         // caso a proporção do navegador seja diferente
@@ -45,10 +43,9 @@ public class MainMenuScreen extends BaseScreen {
 
         // BOTÃO "CAMPAIGN"
         TextButton campaignButton = UIFactory.createButton("Campaign", skin, () -> {
-            Gdx.app.log("MainMenu", "Transition to Campaign");
-            GridManager gridManager = new GridManager(GameConfig.GRID_COLS, GameConfig.GRID_ROWS);
-            PreparationScreen prepScreen = new PreparationScreen(game, skin, gridManager);
-            game.changeScreen(prepScreen);
+            Gdx.app.log("MainMenu", "Transition to Level Selection");
+
+            game.changeScreen(new SelectLevelScreen(game, skin));
         });
         table.add(campaignButton).row();
 
@@ -57,7 +54,6 @@ public class MainMenuScreen extends BaseScreen {
             Gdx.app.log("MainMenu", "Transition to Multiplayer");
         });
         table.add(multiplayerButton).padBottom(0).row();
-
     }
 
     @Override

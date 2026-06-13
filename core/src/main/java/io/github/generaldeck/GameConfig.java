@@ -16,11 +16,13 @@ public class GameConfig {
 
     // tamanho do grid
     public static final int TILE_SIZE = 55;
-    public static final int GRID_COLS = 10;
-    public static final int GRID_ROWS = 10;
+    public static final int GRID_COLS = 5;
+    public static final int GRID_ROWS = 5;
     public static final float UNIT_ICON_SIZE = 64f;
     public static final float DRAG_OFFSET_X = 32f;
     public static final float DRAG_OFFSET_Y = -32f;
+
+    public static final float UNIT_DRAW_SIZE = 8f;
 
     private GameConfig() {
         throw new UnsupportedOperationException("Esta classe não deve ser instaciada. " +
