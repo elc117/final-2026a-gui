@@ -22,8 +22,8 @@ public class GameConfig {
     public static final float DRAG_OFFSET_X = UNIT_ICON_SIZE / 2f;
     public static final float DRAG_OFFSET_Y = -(UNIT_ICON_SIZE / 2f);
 
-    // tamanho do sprite
-    public static final float SPRITE_DRAW_SIZE = 150f;
+    // tamanho do sprite no combate
+    public static final float SPRITE_DRAW_SIZE = 55f;
 
     public static final float UNIT_DRAW_SIZE = 8f;
 

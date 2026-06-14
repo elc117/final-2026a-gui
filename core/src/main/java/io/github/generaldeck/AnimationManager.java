@@ -1,46 +1,55 @@
 package io.github.generaldeck;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class AnimationManager {
-    // A animação para o combate
-    public static Animation<TextureRegion> warriorRun;
+
+    // Guerreiro
+    public static Animation<TextureRegion> warriorWalk;
+    public static Animation<TextureRegion> warriorAttack; // adicione Warrior_Attack.png depois
     public static TextureRegionDrawable warriorIcon;
 
+    // Arqueiro
+    public static Animation<TextureRegion> archerWalk;    // adicione Archer_Walk.png depois
     public static Animation<TextureRegion> archerShoot;
     public static TextureRegionDrawable archerIcon;
 
+    public static Texture battleBackground;
+
     public static void load() {
-        Texture sheet = new Texture("Warrior_Run.png");
-        Texture archerSheet = new Texture("Archer_Shoot.png");
+        Texture warriorSheet = new Texture("Warrior_Run.png");
+        Texture archerSheet  = new Texture("Archer_Shoot.png");
+        battleBackground = new Texture("Background_Combate.png");
 
-        int WARRIOR_FRAMES = 6; // Warrior_Run.png tem 6 frames
-        int ARCHER_FRAMES  = 8; // Archer_Shoot.png tem 8 frames
+        // Log para depurar tamanho real das sheets
+        Gdx.app.log("AnimationManager", "Warrior: " + warriorSheet.getWidth() + "x" + warriorSheet.getHeight());
+        Gdx.app.log("AnimationManager", "Archer:  " + archerSheet.getWidth()  + "x" + archerSheet.getHeight());
 
-        // Calcula o tamanho de cada frame dinamicamente — sem hardcode
-        int warriorFrameSize = sheet.getWidth() / WARRIOR_FRAMES;
-        int archerFrameSize  = archerSheet.getWidth() / ARCHER_FRAMES;
+        int WARRIOR_FRAMES = 6;
+        int ARCHER_FRAMES  = 8;
 
-        TextureRegion[][] pedacos         = TextureRegion.split(sheet,       warriorFrameSize, sheet.getHeight());
-        TextureRegion[][] pedacosArqueiro = TextureRegion.split(archerSheet, archerFrameSize,  archerSheet.getHeight());
+        int warriorFrameW = warriorSheet.getWidth() / WARRIOR_FRAMES;
+        int archerFrameW  = archerSheet.getWidth()  / ARCHER_FRAMES;
 
-        // Monta o Arqueiro (8 frames)
-        TextureRegion[] framesArqueiro = new TextureRegion[ARCHER_FRAMES];
-        for (int i = 0; i < ARCHER_FRAMES; i++) {
-            framesArqueiro[i] = pedacosArqueiro[0][i];
-        }
-        archerShoot = new Animation<>(0.1f, framesArqueiro);
-        archerIcon  = new TextureRegionDrawable(framesArqueiro[0]);
+        TextureRegion[][] warriorFrames = TextureRegion.split(warriorSheet, warriorFrameW, warriorSheet.getHeight());
+        TextureRegion[][] archerFrames  = TextureRegion.split(archerSheet,  archerFrameW,  archerSheet.getHeight());
 
-        // Monta o Guerreiro (6 frames, não 8!)
-        TextureRegion[] frames = new TextureRegion[WARRIOR_FRAMES];
-        for (int i = 0; i < WARRIOR_FRAMES; i++) {
-            frames[i] = pedacos[0][i];
-        }
-        warriorRun  = new Animation<>(0.1f, frames);
-        warriorIcon = new TextureRegionDrawable(frames[0]);
+        // Monta guerreiro
+        TextureRegion[] wFrames = new TextureRegion[WARRIOR_FRAMES];
+        for (int i = 0; i < WARRIOR_FRAMES; i++) wFrames[i] = warriorFrames[0][i];
+        warriorWalk   = new Animation<>(0.1f, wFrames);
+        warriorAttack = warriorWalk; // fallback até ter Warrior_Attack.png
+        warriorIcon   = new TextureRegionDrawable(wFrames[0]);
+
+        // Monta arqueiro
+        TextureRegion[] aFrames = new TextureRegion[ARCHER_FRAMES];
+        for (int i = 0; i < ARCHER_FRAMES; i++) aFrames[i] = archerFrames[0][i];
+        archerShoot = new Animation<>(0.1f, aFrames);
+        archerWalk  = archerShoot; // fallback até ter Archer_Walk.png
+        archerIcon  = new TextureRegionDrawable(aFrames[0]);
     }
 }

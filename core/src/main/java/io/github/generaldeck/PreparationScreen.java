@@ -178,9 +178,9 @@ public class PreparationScreen extends BaseScreen {
 
     private TextButton createStartButton() {
         return UIFactory.createButton("Iniciar Combate", skin, () -> {
-            Gdx.app.log("Preparation", "Iniciando combate! Extraindo dados do Grid...");
             String[][] playerFormation = gridManager.getGridState();
-            game.changeScreen(new CombatScreen(game, playerFormation, enemyGrid));
+            // Passa o skin para o CombatScreen agora
+            game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid));
         });
     }
 
