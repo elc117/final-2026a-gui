@@ -40,3 +40,10 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Refatoração de alguns códigos muito feios
 * Criação de um sistema de seleção de níveis e criação de inimigos
 * `LevelManager`, `SelectLevelScreen`
+
+## Progresso 14/06
+**O que foi feito:**
+* Criada uma classe AnimationManager para carregar as texturas uma única vez quando o jogo abrir, e guardá-las na memória.
+* Adicionado background na tela de combate.
+* Adicionado sprites de arqueiro e soldado, com animações na região de combate.
+* Implementado lógica de animação para espelhar o sprite horizontalmente dependendo a direção do movimento.
