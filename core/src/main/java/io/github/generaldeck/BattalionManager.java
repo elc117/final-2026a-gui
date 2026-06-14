@@ -1,5 +1,6 @@
 package io.github.generaldeck;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -23,10 +24,17 @@ public class BattalionManager {
     public void spawnUnit(String type, float x, float y, int team) {
         Unit unit = unitPool.obtain();
 
-        if ("ARCHER".equals(type)) {
-            unit.setToArcher(team, x, y);
-        } else {
-            unit.setToWarrior(team, x, y);
+        switch(type) {
+            case "ARCHER":
+                unit.setToArcher(team, x, y);
+                break;
+            case "WARRIOR":
+                unit.setToWarrior(team, x, y);
+                break;
+            default:
+                Gdx.app.error("Spawns", "Tipo de unidade desconhecido: " + type);
+                unitPool.free(unit);
+                return;
         }
 
         activeUnits.add(unit);
@@ -42,8 +50,7 @@ public class BattalionManager {
                 continue;
             }
 
-            unit.animTime += delta; // <-- novo: timer por unidade
-
+            unit.animTime += delta;
             if (unit.attackTimer > 0) unit.attackTimer -= delta;
 
             if (unit.effectTimer > 0) {
@@ -54,14 +61,29 @@ public class BattalionManager {
                 }
             }
 
+            if (unit.isAttacking) {
+                unit.attackLockTimer -= delta;
+                unit.velocity.setZero();
+
+                if (unit.attackLockTimer > 0) {
+                    continue;
+                }
+                unit.isAttacking = false;
+            }
+
             // máquina de estados
             switch (unit.currentBehavior) {
-                case SEEK_CLOSEST:  applySeekMath(unit, findClosestEnemy(unit));  break;
-                case SEEK_LOWEST_HP:applySeekMath(unit, findLowestHpEnemy(unit)); break;
-                case FLEE:          applyFleeMath(unit, findClosestEnemy(unit));  break;
-                case STUNNED:
+                case SEEK_CLOSEST:
+                    processCombatAndMovement(unit, findClosestEnemy(unit), false);
+                    break;
+                case SEEK_LOWEST_HP:
+                    processCombatAndMovement(unit, findLowestHpEnemy(unit), false);
+                    break;
+                case FLEE:
+                    processCombatAndMovement(unit, findClosestEnemy(unit), true);
+                    break;
+                default:
                     unit.velocity.setZero();
-                    unit.isAttacking = false;
                     break;
             }
 
@@ -105,7 +127,6 @@ public class BattalionManager {
     private void applySeekMath(Unit seeker, Unit target) {
         if (target == null) {
             seeker.velocity.setZero();
-            seeker.isAttacking = false;
             return;
         }
 
@@ -113,30 +134,15 @@ public class BattalionManager {
         float dirY     = target.position.y - seeker.position.y;
         float distance = (float) Math.sqrt(dirX * dirX + dirY * dirY);
 
-        if (distance > seeker.attackRange) {
+        if (distance > 0) {
             dirX /= distance;
             dirY /= distance;
-            seeker.velocity.x    = dirX * seeker.moveSpeed;
-            seeker.velocity.y    = dirY * seeker.moveSpeed;
-            seeker.isAttacking   = false;
-
-            if (Math.abs(dirX) > 0.01f) seeker.facingRight = dirX > 0;
-        } else {
-            seeker.velocity.setZero();
-            seeker.isAttacking = true;
-            // olha para o alvo mesmo parado
-            seeker.facingRight = target.position.x > seeker.position.x;
-
-            if (seeker.attackTimer <= 0) {
-                target.currentHp -= seeker.damage;
-                seeker.attackTimer = seeker.attackCooldown;
-
-                if (target.currentHp <= 0) {
-                    target.currentHp = 0;
-                    target.isDead    = true;
-                }
-            }
         }
+
+        seeker.velocity.x = dirX * seeker.moveSpeed;
+        seeker.velocity.y = dirY * seeker.moveSpeed;
+
+        if (Math.abs(dirX) > 0.01f) seeker.facingRight = dirX > 0;
     }
 
     private void applyFleeMath(Unit fleer, Unit threat) {
@@ -218,6 +224,44 @@ public class BattalionManager {
         unit.velocity.y += pushY * separationForce;
     }
 
+    private void processCombatAndMovement(Unit unit, Unit target, boolean isFleeing) {
+        if (target == null) {
+            unit.velocity.setZero();
+            return;
+        }
+
+        float dx = target.position.x - unit.position.x;
+        float dy = target.position.y - unit.position.y;
+        float distSq = (dx * dx) + (dy * dy);
+        float rangeSq = unit.attackRange * unit.attackRange;
+
+        if (distSq <= rangeSq && !isFleeing) {
+            // Lógica de combate
+            unit.velocity.setZero();
+            unit.facingRight = dx > 0;
+
+            if (unit.attackTimer <= 0) {
+                unit.isAttacking = true;
+                unit.animTime = 0f;
+                unit.attackLockTimer = unit.attackDuration;
+                unit.attackTimer = unit.attackCooldown;
+
+                target.currentHp -= unit.damage;
+                if (target.currentHp <= 0) {
+                    target.currentHp = 0;
+                    target.isDead = true;
+                }
+            }
+        } else {
+            // movimento
+            if (isFleeing) {
+                applyFleeMath(unit, target);
+            } else {
+                applySeekMath(unit, target);
+            }
+        }
+    }
+
     public void spawnArmies(String[][] playerGrid, String[][] enemyGrid) {
         int cols = playerGrid.length;
         int rows = playerGrid[0].length;
@@ -279,13 +323,18 @@ public class BattalionManager {
             // Escolhe a animação correta
             Animation<TextureRegion> anim;
             if ("ARCHER".equals(unit.type)) {
-                anim = unit.isAttacking ? AnimationManager.archerShoot : AnimationManager.archerWalk;
+                anim = unit.isAttacking ? AnimationManager.archerShoot : AnimationManager.archerRun;
             } else {
-                anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorWalk;
+                anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;
             }
 
-            // Usa o timer individual da unidade
-            TextureRegion frame = anim.getKeyFrame(unit.animTime, true);
+            TextureRegion frame;
+
+            if (!unit.isAttacking && unit.velocity.len2() < 25f) {
+                frame = anim.getKeyFrames()[0];
+            } else {
+                frame = anim.getKeyFrame(unit.animTime);
+            }
 
             float drawSize = GameConfig.SPRITE_DRAW_SIZE;
             float drawX    = unit.position.x - (drawSize / 2f);

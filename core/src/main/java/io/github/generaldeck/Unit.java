@@ -20,7 +20,9 @@ public class Unit {
 
     public boolean facingRight = true;  // espelha o sprite
     public boolean isAttacking = false; // escolhe walk vs attack animation
-    public float   animTime    = 0f;    // timer individual por unidade
+    public float   animTime    = 0f;
+    public float attackDuration;
+    public float attackLockTimer = 0f;
 
     public void setToWarrior(int team, float x, float y) {
         this.type            = "WARRIOR";
@@ -41,6 +43,7 @@ public class Unit {
         this.facingRight     = (team == 0); // jogador vai pra direita, inimigo pra esquerda
         this.isAttacking     = false;
         this.animTime        = 0f;
+        this.attackDuration  = 0.8f;
     }
 
     public void setToArcher(int team, float x, float y) {
@@ -62,6 +65,7 @@ public class Unit {
         this.facingRight     = (team == 0);
         this.isAttacking     = false;
         this.animTime        = 0f;
+        this.attackDuration  = 3.2f;
     }
 
     public void reset() {
@@ -75,5 +79,6 @@ public class Unit {
         currentBehavior  = UnitBehavior.SEEK_CLOSEST;
         isAttacking      = false;
         animTime         = 0f;
+        attackLockTimer  = 0f;
     }
 }

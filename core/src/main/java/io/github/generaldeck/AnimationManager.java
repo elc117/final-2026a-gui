@@ -9,47 +9,84 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class AnimationManager {
 
     // Guerreiro
-    public static Animation<TextureRegion> warriorWalk;
+    public static Animation<TextureRegion> warriorRun;
     public static Animation<TextureRegion> warriorAttack;
     public static TextureRegionDrawable warriorIcon;
 
     // Arqueiro
-    public static Animation<TextureRegion> archerWalk;
+    public static Animation<TextureRegion> archerRun;
     public static Animation<TextureRegion> archerShoot;
     public static TextureRegionDrawable archerIcon;
 
     public static Texture battleBackground;
 
+    private static Texture warriorRunSheet;
+    private static Texture warriorAttackSheet;
+    private static Texture archerRunSheet;
+    private static Texture archerShootSheet;
+
     public static void load() {
-        Texture warriorSheet = new Texture("Warrior_Run.png");
-        Texture archerSheet  = new Texture("Archer_Shoot.png");
+        if (warriorRunSheet != null) return;
+
+        warriorRunSheet = new Texture("Warrior_Run.png");
+        warriorAttackSheet = new Texture("Warrior_Attack1.png");
+        archerRunSheet  = new Texture("Archer_Run.png");
+        archerShootSheet = new Texture("Archer_Shoot.png");
         battleBackground = new Texture("Background_Combate.png");
 
         // Log para depurar tamanho real das sheets
-        Gdx.app.log("AnimationManager", "Warrior: " + warriorSheet.getWidth() + "x" + warriorSheet.getHeight());
-        Gdx.app.log("AnimationManager", "Archer:  " + archerSheet.getWidth()  + "x" + archerSheet.getHeight());
+        Gdx.app.log("AnimationManager", "Warrior: " + warriorRunSheet.getWidth() + "x" + warriorRunSheet.getHeight());
+        Gdx.app.log("AnimationManager", "Archer:  " + archerRunSheet.getWidth()  + "x" + archerRunSheet.getHeight());
 
-        int WARRIOR_FRAMES = 6;
-        int ARCHER_FRAMES  = 8;
+        int WARRIOR_RUN_FRAMES = 6;
+        int WARRIOR_ATK_FRAMES = 4;
+        int ARCHER_RUN_FRAMES  = 4;
+        int ARCHER_SHOOT_FRAMES = 8;
 
-        int warriorFrameW = warriorSheet.getWidth() / WARRIOR_FRAMES;
-        int archerFrameW  = archerSheet.getWidth()  / ARCHER_FRAMES;
+        int warriorFrameW = warriorRunSheet.getWidth() / WARRIOR_RUN_FRAMES;
+        int archerFrameW  = archerRunSheet.getWidth()  / ARCHER_RUN_FRAMES;
 
-        TextureRegion[][] warriorFrames = TextureRegion.split(warriorSheet, warriorFrameW, warriorSheet.getHeight());
-        TextureRegion[][] archerFrames  = TextureRegion.split(archerSheet,  archerFrameW,  archerSheet.getHeight());
+        // WARRIOR RUN
+        TextureRegion[][] wrFrames = TextureRegion.split(warriorRunSheet,
+            warriorRunSheet.getWidth() / WARRIOR_RUN_FRAMES, warriorRunSheet.getHeight());
+        warriorRun = new Animation<>(0.1f, wrFrames[0]);
+        warriorRun.setPlayMode(Animation.PlayMode.LOOP);
 
-        // Monta guerreiro
-        TextureRegion[] wFrames = new TextureRegion[WARRIOR_FRAMES];
-        for (int i = 0; i < WARRIOR_FRAMES; i++) wFrames[i] = warriorFrames[0][i];
-        warriorWalk   = new Animation<>(0.1f, wFrames);
-        warriorAttack = warriorWalk; // fallback até ter Warrior_Attack.png
-        warriorIcon   = new TextureRegionDrawable(wFrames[0]);
+        // WARRIOR ATTACK
+        TextureRegion[][] waFrames = TextureRegion.split(warriorAttackSheet,
+            warriorAttackSheet.getWidth() / WARRIOR_ATK_FRAMES, warriorAttackSheet.getHeight());
+        warriorAttack = new Animation<>(0.2f, waFrames[0]);
+        warriorAttack.setPlayMode(Animation.PlayMode.NORMAL);
 
-        // Monta arqueiro
-        TextureRegion[] aFrames = new TextureRegion[ARCHER_FRAMES];
-        for (int i = 0; i < ARCHER_FRAMES; i++) aFrames[i] = archerFrames[0][i];
-        archerShoot = new Animation<>(0.1f, aFrames);
-        archerWalk  = archerShoot; // fallback até ter Archer_Walk.png
-        archerIcon  = new TextureRegionDrawable(aFrames[0]);
+        // ARCHER RUN
+        TextureRegion[][] awFrames = TextureRegion.split(archerRunSheet,
+            archerRunSheet.getWidth() / ARCHER_RUN_FRAMES, archerRunSheet.getHeight());
+        archerRun = new Animation<>(0.1f, awFrames[0]);
+        archerRun.setPlayMode(Animation.PlayMode.LOOP);
+
+        // ARCHER SHOOT
+        TextureRegion[][] aaFrames = TextureRegion.split(archerShootSheet,
+            archerShootSheet.getWidth() / ARCHER_SHOOT_FRAMES, archerShootSheet.getHeight());
+        archerShoot = new Animation<>(0.4f, aaFrames[0]);
+        archerShoot.setPlayMode(Animation.PlayMode.NORMAL);
+
+        // icone de guerreirro
+        warriorIcon = new TextureRegionDrawable(wrFrames[0][0]);
+
+        // icone de arqueiro
+        archerIcon  = new TextureRegionDrawable(awFrames[0][0]);
+    }
+
+    // metodo para ser chamado quando sair da tela de combate
+    public static void dispose() {
+        if (warriorRunSheet != null) warriorRunSheet.dispose();
+        if (warriorAttackSheet != null) warriorAttackSheet.dispose();
+        if (archerRunSheet != null) archerRunSheet.dispose();
+        if (archerShootSheet != null) archerShootSheet.dispose();
+        if (battleBackground != null) battleBackground.dispose();
+
+        warriorRunSheet = null;
+        archerRunSheet = null;
+        battleBackground = null;
     }
 }
