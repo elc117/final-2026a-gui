@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class BattalionManager {
 
@@ -264,19 +266,21 @@ public class BattalionManager {
         }
     }
 
-    public void render(ShapeRenderer shapeRenderer) {
+    public void render(SpriteBatch batch, float stateTime) {
+        TextureRegion frameGuerreiro = AnimationManager.warriorRun.getKeyFrame(stateTime, true);
+        TextureRegion frameArqueiro  = AnimationManager.archerShoot.getKeyFrame(stateTime, true);
+
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
 
-            if (unit.team == 0) {
-                shapeRenderer.setColor(Color.GREEN);
-            } else {
-                shapeRenderer.setColor(Color.RED);
-            }
+            float drawSize = GameConfig.SPRITE_DRAW_SIZE;
+            float drawX    = unit.position.x - (drawSize / 2f);
+            float drawY    = unit.position.y - (drawSize / 2f);
 
-            // Desenha a unidade como um círculo sólido de raio 8 pixels
-            // Acesso direto aos atributos públicos, sem métodos getPosition()
-            shapeRenderer.circle(unit.position.x, unit.position.y, GameConfig.UNIT_DRAW_SIZE);
+            // Escolhe o frame correto pelo tipo da unidade
+            TextureRegion frame = "ARCHER".equals(unit.type) ? frameArqueiro : frameGuerreiro;
+
+            batch.draw(frame, drawX, drawY, drawSize, drawSize);
         }
     }
 }

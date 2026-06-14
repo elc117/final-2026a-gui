@@ -25,6 +25,8 @@ public class Main extends Game {
         assetManager.finishLoading();
         skin = assetManager.get("uiskin.json", Skin.class);
 
+        AnimationManager.load(); // carrega todas as animações dos sprites logo ao iniciar
+
         this.setScreen(new MainMenuScreen(this, skin));
     }
 

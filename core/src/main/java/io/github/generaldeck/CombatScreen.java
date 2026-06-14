@@ -4,19 +4,21 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class CombatScreen extends BaseScreen {
     private final FitViewport viewport;
-    private final ShapeRenderer shapeRenderer;
+    private final SpriteBatch batch;
     private final BattalionManager battalionManager;
+    private float stateTime = 0f; // cronômetro para a animação
 
     public CombatScreen(Main game, String[][] playerGrid, String[][] enemyGrid) {
         super(game);
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
 
-        this.shapeRenderer = new ShapeRenderer();
+        this.batch = new SpriteBatch();
 
         this.battalionManager = new BattalionManager();
 
@@ -26,19 +28,19 @@ public class CombatScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
-
         viewport.apply(); // Aplica as transformações de câmera
 
+        stateTime += delta; // Atualiza o tempo da animação
         // atualiza a lógica de IA/Física de todas as tropas
         battalionManager.update(delta);
 
-        // renderiza as tropas
-        shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        // configura o batch para desenhar na câmera correta
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+        batch.begin();
 
-        battalionManager.render(shapeRenderer); // delegamos o desenho ao manager
+        battalionManager.render(batch, stateTime);
 
-        shapeRenderer.end();
+        batch.end();
     }
 
     @Override
@@ -48,6 +50,6 @@ public class CombatScreen extends BaseScreen {
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose(); // Previne vazamento de memória de vídeo
+        batch.dispose(); // Evita vazamento de memória
     }
 }

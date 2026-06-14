@@ -18,9 +18,12 @@ public class GameConfig {
     public static final int TILE_SIZE = 55;
     public static final int GRID_COLS = 5;
     public static final int GRID_ROWS = 5;
-    public static final float UNIT_ICON_SIZE = 64f;
-    public static final float DRAG_OFFSET_X = 32f;
-    public static final float DRAG_OFFSET_Y = -32f;
+    public static final float UNIT_ICON_SIZE = 150f;
+    public static final float DRAG_OFFSET_X = UNIT_ICON_SIZE / 2f;
+    public static final float DRAG_OFFSET_Y = -(UNIT_ICON_SIZE / 2f);
+
+    // tamanho do sprite
+    public static final float SPRITE_DRAW_SIZE = 150f;
 
     public static final float UNIT_DRAW_SIZE = 8f;
 
