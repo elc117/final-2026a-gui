@@ -10,11 +10,11 @@ public class AnimationManager {
 
     // Guerreiro
     public static Animation<TextureRegion> warriorWalk;
-    public static Animation<TextureRegion> warriorAttack; // adicione Warrior_Attack.png depois
+    public static Animation<TextureRegion> warriorAttack;
     public static TextureRegionDrawable warriorIcon;
 
     // Arqueiro
-    public static Animation<TextureRegion> archerWalk;    // adicione Archer_Walk.png depois
+    public static Animation<TextureRegion> archerWalk;
     public static Animation<TextureRegion> archerShoot;
     public static TextureRegionDrawable archerIcon;
 
