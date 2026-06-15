@@ -1,8 +1,10 @@
 package io.github.generaldeck;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pool;
 
-public class Unit {
+public class Unit implements Pool.Poolable {
     public String  type;
     public Vector2 position        = new Vector2();
     public Vector2 velocity        = new Vector2();
@@ -23,13 +25,14 @@ public class Unit {
     public float   animTime    = 0f;
     public float attackDuration;
     public float attackLockTimer = 0f;
+    public boolean isRanged;
 
     public void setToWarrior(int team, float x, float y) {
         this.type            = "WARRIOR";
         this.team            = team;
         this.position.set(x, y);
         this.velocity.setZero();
-        this.maxHp           = 100f;
+        this.maxHp           = 140f;
         this.currentHp       = maxHp;
         this.damage          = 10f;
         this.moveSpeed       = 60f;
@@ -44,6 +47,7 @@ public class Unit {
         this.isAttacking     = false;
         this.animTime        = 0f;
         this.attackDuration  = 0.8f;
+        this.isRanged = false;
     }
 
     public void setToArcher(int team, float x, float y) {
@@ -55,7 +59,7 @@ public class Unit {
         this.currentHp       = maxHp;
         this.damage          = 15f;
         this.moveSpeed       = 50f;
-        this.attackRange     = 150f;
+        this.attackRange     = 300f;
         this.attackCooldown  = 1.5f;
         this.attackTimer     = 0f;
         this.effectTimer     = 0f;
@@ -66,8 +70,10 @@ public class Unit {
         this.isAttacking     = false;
         this.animTime        = 0f;
         this.attackDuration  = 3.2f;
+        this.isRanged = true;
     }
 
+    @Override
     public void reset() {
         type             = null;
         position.setZero();
@@ -80,5 +86,6 @@ public class Unit {
         isAttacking      = false;
         animTime         = 0f;
         attackLockTimer  = 0f;
+        //Gdx.app.log("Sistema de Pool", "Uma unidade morreu e o reset() foi chamado com sucesso!");
     }
 }

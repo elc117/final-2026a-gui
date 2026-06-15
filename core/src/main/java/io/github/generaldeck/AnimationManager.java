@@ -17,6 +17,7 @@ public class AnimationManager {
     public static Animation<TextureRegion> archerRun;
     public static Animation<TextureRegion> archerShoot;
     public static TextureRegionDrawable archerIcon;
+    public static TextureRegion arrowIcon;
 
     public static Texture battleBackground;
 
@@ -24,6 +25,7 @@ public class AnimationManager {
     private static Texture warriorAttackSheet;
     private static Texture archerRunSheet;
     private static Texture archerShootSheet;
+    private static Texture arrowSheet;
 
     public static void load() {
         if (warriorRunSheet != null) return;
@@ -33,6 +35,7 @@ public class AnimationManager {
         archerRunSheet  = new Texture("Archer_Run.png");
         archerShootSheet = new Texture("Archer_Shoot.png");
         battleBackground = new Texture("Background_Combate.png");
+        arrowSheet = new Texture("Arrow.png");
 
         // Log para depurar tamanho real das sheets
         Gdx.app.log("AnimationManager", "Warrior: " + warriorRunSheet.getWidth() + "x" + warriorRunSheet.getHeight());
@@ -43,8 +46,7 @@ public class AnimationManager {
         int ARCHER_RUN_FRAMES  = 4;
         int ARCHER_SHOOT_FRAMES = 8;
 
-        int warriorFrameW = warriorRunSheet.getWidth() / WARRIOR_RUN_FRAMES;
-        int archerFrameW  = archerRunSheet.getWidth()  / ARCHER_RUN_FRAMES;
+        arrowIcon = new TextureRegion(arrowSheet);
 
         // WARRIOR RUN
         TextureRegion[][] wrFrames = TextureRegion.split(warriorRunSheet,
@@ -84,6 +86,7 @@ public class AnimationManager {
         if (archerRunSheet != null) archerRunSheet.dispose();
         if (archerShootSheet != null) archerShootSheet.dispose();
         if (battleBackground != null) battleBackground.dispose();
+        if (arrowSheet != null) arrowSheet.dispose();
 
         warriorRunSheet = null;
         archerRunSheet = null;
