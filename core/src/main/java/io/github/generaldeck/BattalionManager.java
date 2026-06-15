@@ -18,8 +18,15 @@ public class BattalionManager {
             return new Unit();
         }
     };
-
     private final Array<Unit> activeUnits = new Array<>(1024);
+
+    private final Pool<Projectile> projectilePool = new Pool<Projectile>() {
+        @Override
+        protected Projectile newObject() {
+            return new Projectile();
+        }
+    };
+    public Array<Projectile> activeProjectiles = new Array<>();
 
     public void spawnUnit(String type, float x, float y, int team) {
         Unit unit = unitPool.obtain();
@@ -40,7 +47,22 @@ public class BattalionManager {
         activeUnits.add(unit);
     }
 
+    private void spawnProjectile(Unit shooter, Unit target) {
+        Projectile proj = projectilePool.obtain();
+        proj.init(shooter.position.x, shooter.position.y, target.position.x, target.position.y, shooter.damage, shooter.team);
+        activeProjectiles.add(proj);
+    }
+
+    private void applyDamage(Unit target, float damage) {
+        target.currentHp -= damage;
+        if (target.currentHp <= 0) {
+            target.currentHp = 0;
+            target.isDead = true;
+        }
+    }
+
     public void update(float delta) {
+        // UNIDADES
         for (int i = activeUnits.size - 1; i >= 0; i--) {
             Unit unit = activeUnits.get(i);
 
@@ -96,6 +118,46 @@ public class BattalionManager {
             unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
             unit.position.y = MathUtils.clamp(unit.position.y, GameConfig.UNIT_DRAW_SIZE,
                 GameConfig.V_HEIGHT - GameConfig.UNIT_DRAW_SIZE);
+        }
+
+        // PROJETEIS
+        for (int i = activeProjectiles.size - 1; i >= 0; i--) {
+            Projectile proj = activeProjectiles.get(i);
+
+            proj.position.x += proj.direction.x * proj.speed * delta;
+            proj.position.y += proj.direction.y * proj.speed * delta;
+
+            // exclui flecha caso saia do limite da tela
+            if (proj.position.x < 0 || proj.position.x > GameConfig.V_WIDTH ||
+                proj.position.y < 0 || proj.position.y > GameConfig.V_HEIGHT) {
+                activeProjectiles.removeIndex(i);
+                projectilePool.free(proj);
+                continue; // Próxima flecha
+            }
+
+            boolean hitSomebody = false;
+            float hitRadiusSq = 20f * 20f;
+
+            for (int j = 0; j < activeUnits.size; j++) {
+                Unit potentialTarget = activeUnits.get(j);
+
+                if (potentialTarget.isDead || potentialTarget.team == proj.team) continue;
+
+                float dx = potentialTarget.position.x - proj.position.x;
+                float dy = potentialTarget.position.y - proj.position.y;
+                float distSq = (dx * dx) + (dy * dy);
+
+                if (distSq <= hitRadiusSq) {
+                    applyDamage(potentialTarget, proj.damage); // PUM!
+                    hitSomebody = true;
+                    break;
+                }
+            }
+
+            if (hitSomebody) {
+                activeProjectiles.removeIndex(i);
+                projectilePool.free(proj);
+            }
         }
     }
 
@@ -246,11 +308,12 @@ public class BattalionManager {
                 unit.attackLockTimer = unit.attackDuration;
                 unit.attackTimer = unit.attackCooldown;
 
-                target.currentHp -= unit.damage;
-                if (target.currentHp <= 0) {
-                    target.currentHp = 0;
-                    target.isDead = true;
+                if (unit.isRanged) {
+                    spawnProjectile(unit, target);
+                } else {
+                    applyDamage(target, unit.damage);
                 }
+
             }
         } else {
             // movimento
@@ -317,6 +380,7 @@ public class BattalionManager {
     }
 
     public void render(SpriteBatch batch, float stateTime) {
+        // DESENHA TROPAS
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
 
@@ -345,6 +409,25 @@ public class BattalionManager {
             } else {
                 // Espelha horizontalmente invertendo o width
                 batch.draw(frame, drawX + drawSize, drawY, -drawSize, drawSize);
+            }
+        }
+        //DESENHA PROJETEIS
+        if (AnimationManager.arrowIcon != null) {
+            TextureRegion arrowTex = AnimationManager.arrowIcon;
+            float w = arrowTex.getRegionWidth() * 0.2f;
+            float h = arrowTex.getRegionHeight() * 0.2f;
+
+            for (int i = 0; i < activeProjectiles.size; i++) {
+                Projectile proj = activeProjectiles.get(i);
+
+                batch.draw(
+                    arrowTex,
+                    proj.position.x - w/2f, proj.position.y - h/2f, // Posição
+                    w/2f, h/2f, // Ponto pivot para girar (Centro da imagem)
+                    w, h,       // Tamanho real
+                    1f, 1f,     // Escala normal
+                    proj.angle  // A mágica: A inclinação calculada lá no momento do disparo!
+                );
             }
         }
     }
