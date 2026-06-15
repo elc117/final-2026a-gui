@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -26,7 +24,7 @@ public class BattalionManager {
             return new Projectile();
         }
     };
-    public Array<Projectile> activeProjectiles = new Array<>();
+    public Array<Projectile> activeProjectiles = new Array<>(1024);
 
     public void spawnUnit(String type, float x, float y, int team) {
         Unit unit = unitPool.obtain();
@@ -51,6 +49,9 @@ public class BattalionManager {
         Projectile proj = projectilePool.obtain();
         proj.init(shooter.position.x, shooter.position.y, target.position.x, target.position.y, shooter.damage, shooter.team);
         activeProjectiles.add(proj);
+
+        // CÂMARA 1
+        //Gdx.app.log("DEBUG", "Flecha CRIADA! Atirador: Time " + shooter.team + " | PosX: " + shooter.position.x);
     }
 
     private void applyDamage(Unit target, float damage) {
@@ -116,8 +117,8 @@ public class BattalionManager {
                 GameConfig.V_WIDTH - GameConfig.UNIT_DRAW_SIZE);
 
             unit.position.y += unit.velocity.y * unit.speedMultiplier * delta;
-            unit.position.y = MathUtils.clamp(unit.position.y, GameConfig.UNIT_DRAW_SIZE,
-                GameConfig.V_HEIGHT - GameConfig.UNIT_DRAW_SIZE);
+            unit.position.y = MathUtils.clamp(unit.position.y, GameConfig.UNIT_DRAW_SIZE + 100f,
+                GameConfig.V_HEIGHT - GameConfig.UNIT_DRAW_SIZE - 100f);
         }
 
         // PROJETEIS
@@ -130,13 +131,20 @@ public class BattalionManager {
             // exclui flecha caso saia do limite da tela
             if (proj.position.x < 0 || proj.position.x > GameConfig.V_WIDTH ||
                 proj.position.y < 0 || proj.position.y > GameConfig.V_HEIGHT) {
+
+                // CÂMARA 2
+                //Gdx.app.log("DEBUG", "Flecha DESTRUÍDA por sair da tela! PosX: " + proj.position.x);
+
                 activeProjectiles.removeIndex(i);
                 projectilePool.free(proj);
                 continue; // Próxima flecha
             }
 
             boolean hitSomebody = false;
-            float hitRadiusSq = 20f * 20f;
+
+            float radius = GameConfig.SPRITE_DRAW_SIZE / 3f;
+
+            float hitRadiusSq = radius * radius;
 
             for (int j = 0; j < activeUnits.size; j++) {
                 Unit potentialTarget = activeUnits.get(j);
@@ -148,7 +156,11 @@ public class BattalionManager {
                 float distSq = (dx * dx) + (dy * dy);
 
                 if (distSq <= hitRadiusSq) {
-                    applyDamage(potentialTarget, proj.damage); // PUM!
+                    applyDamage(potentialTarget, proj.damage);
+
+                    // CÂMARA 3
+                    //Gdx.app.log("DEBUG", "Flecha ACERTOU o alvo! Dano: " + proj.damage + " | Time atingido: " + potentialTarget.team);
+
                     hitSomebody = true;
                     break;
                 }
@@ -362,7 +374,7 @@ public class BattalionManager {
                     float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
 
                     // SPAWNA AS UNIDADES
-                    spawnSquad(unitType, worldX, worldY, 50, team);
+                    spawnSquad(unitType, worldX, worldY, 60, team);
                 }
             }
         }
@@ -371,8 +383,8 @@ public class BattalionManager {
     private void spawnSquad(String type, float centerX, float centerY, int count, int team) {
         for (int i = 0; i < count; i++) {
             // Adiciona uma pequena variação (jitter) para as unidades não nascerem exatamente em cima da outra
-            float jitterX = (float) (Math.random() * 100 - 20);
-            float jitterY = (float) (Math.random() * 100 - 20);
+            float jitterX = (float) (Math.random() * 100);
+            float jitterY = (float) (Math.random() * 100);
 
             // O Pool entra em ação: Zero alocação de 'new Unit()' no Heap!
             spawnUnit(type, centerX + jitterX, centerY + jitterY, team);
@@ -383,6 +395,10 @@ public class BattalionManager {
         // DESENHA TROPAS
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
+
+            if (unit.isRanged && !"ARCHER".equals(unit.type)) {
+                Gdx.app.error("BUG CRÍTICO", "Arqueiro sofreu mutação! O tipo agora é: " + unit.type + " | Time: " + unit.team);
+            }
 
             // Escolhe a animação correta
             Animation<TextureRegion> anim;
@@ -414,8 +430,9 @@ public class BattalionManager {
         //DESENHA PROJETEIS
         if (AnimationManager.arrowIcon != null) {
             TextureRegion arrowTex = AnimationManager.arrowIcon;
-            float w = arrowTex.getRegionWidth() * 0.2f;
-            float h = arrowTex.getRegionHeight() * 0.2f;
+            // dá pra diminuir o tamanho da imagem direto pra ocupar menos memoria
+            float w = arrowTex.getRegionWidth() * 0.3f;
+            float h = arrowTex.getRegionHeight() * 0.3f;
 
             for (int i = 0; i < activeProjectiles.size; i++) {
                 Projectile proj = activeProjectiles.get(i);

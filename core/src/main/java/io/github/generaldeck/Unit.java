@@ -32,7 +32,7 @@ public class Unit implements Pool.Poolable {
         this.team            = team;
         this.position.set(x, y);
         this.velocity.setZero();
-        this.maxHp           = 100f;
+        this.maxHp           = 140f;
         this.currentHp       = maxHp;
         this.damage          = 10f;
         this.moveSpeed       = 60f;
@@ -59,7 +59,7 @@ public class Unit implements Pool.Poolable {
         this.currentHp       = maxHp;
         this.damage          = 15f;
         this.moveSpeed       = 50f;
-        this.attackRange     = 150f;
+        this.attackRange     = 300f;
         this.attackCooldown  = 1.5f;
         this.attackTimer     = 0f;
         this.effectTimer     = 0f;

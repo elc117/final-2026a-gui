@@ -6,6 +6,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -33,6 +34,17 @@ public class MainMenuScreen extends BaseScreen {
         Table table = new Table();
         table.setFillParent(true);
         this.stage.addActor(table);
+
+        Label titleLabel = new Label("GENERAL DECK", skin);
+        titleLabel.setFontScale(2.5f); // Aumenta a fonte para parecer um título de verdade (ajuste o valor como quiser)
+        Label descLabel = new Label("Essa eh apenas uma versao alpha. Nao representa o resultado final!", skin);
+        Label descLabel2 = new Label("Planejamos implementar mais unidades, niveis e cartas de habilidade.", skin);
+        descLabel.setFontScale(1f);
+
+        // Adiciona à tabela, dá um espaçamento grande em baixo (ex: 60px) e PULA DE LINHA!
+        table.add(titleLabel).padBottom(60f).row();
+        table.add(descLabel).padBottom(30f).row();
+        table.add(descLabel2).padBottom(30f).row();
 
         // table é um gerenciador de layout dinamico, como se fosse uma tabela mesmo e ai só dizer em que
         // coluna e linha queremos o botão/elemento

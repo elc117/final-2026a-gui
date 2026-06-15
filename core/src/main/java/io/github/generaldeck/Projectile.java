@@ -17,6 +17,7 @@ public class Projectile implements Pool.Poolable {
         this.position.set(startX, startY);
         this.damage = damage;
         this.isDead = false;
+        this.team = team;
 
         float dx = targetX - startX;
         float dy = targetY - startY;
@@ -34,5 +35,6 @@ public class Projectile implements Pool.Poolable {
     public void reset() {
         this.isDead = false;
         this.direction.setZero();
+        this.position.setZero();
     }
 }
