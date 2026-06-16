@@ -4,12 +4,10 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -19,6 +17,7 @@ public class MainMenuScreen extends BaseScreen {
 
     private final Stage stage;
     private final FitViewport viewport;
+    private Texture backgroundTexture;
 
     // Skin é o repositório central de estilos e recursos da UI
     // vamos criar um arquivo depois que vai funcionar como se fosse um stylesheet CSS
@@ -31,15 +30,18 @@ public class MainMenuScreen extends BaseScreen {
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
         this.stage = new Stage(this.viewport);
 
+        backgroundTexture = new Texture(Gdx.files.internal("Background_Combate.png"));
+        Image backgroundImage = new Image(backgroundTexture);
+        backgroundImage.setFillParent(true);
+        this.stage.addActor(backgroundImage);
+
         Table table = new Table();
         table.setFillParent(true);
         this.stage.addActor(table);
 
-        Label titleLabel = new Label("GENERAL DECK", skin);
-        titleLabel.setFontScale(2.5f); // Aumenta a fonte para parecer um título de verdade (ajuste o valor como quiser)
-        Label descLabel = new Label("Essa eh apenas uma versao alpha. Nao representa o resultado final!", skin);
-        Label descLabel2 = new Label("Planejamos implementar mais unidades, niveis e cartas de habilidade.", skin);
-        descLabel.setFontScale(1f);
+        Label titleLabel = new Label("GENERAL DECK", skin, "text_blue_ribbon");
+        Label descLabel = new Label("Essa eh apenas uma versao alpha. Nao representa o resultado final!", skin, "small");
+        Label descLabel2 = new Label("Planejamos implementar mais unidades, niveis e cartas de habilidade.", skin, "small");
 
         // Adiciona à tabela, dá um espaçamento grande em baixo (ex: 60px) e PULA DE LINHA!
         table.add(titleLabel).padBottom(60f).row();
@@ -48,13 +50,10 @@ public class MainMenuScreen extends BaseScreen {
 
         // table é um gerenciador de layout dinamico, como se fosse uma tabela mesmo e ai só dizer em que
         // coluna e linha queremos o botão/elemento
-        table.defaults()
-            .width(GameConfig.BUTTON_WIDTH)
-            .height(GameConfig.BUTTON_HEIGHT)
-            .padBottom(GameConfig.PAD_DEFAULT);
+        table.defaults().padBottom(GameConfig.PAD_DEFAULT);
 
         // BOTÃO "CAMPAIGN"
-        TextButton campaignButton = UIFactory.createButton("Campaign", skin, () -> {
+        TextButton campaignButton = UIFactory.createButton("Campaign", skin, "default", () -> {
             Gdx.app.log("MainMenu", "Transition to Level Selection");
 
             game.changeScreen(new SelectLevelScreen(game, skin));
@@ -62,7 +61,7 @@ public class MainMenuScreen extends BaseScreen {
         table.add(campaignButton).row();
 
         // BOTÃO "MULTIPLAYER"
-        TextButton multiplayerButton = UIFactory.createButton("Multiplayer", skin, () -> {
+        TextButton multiplayerButton = UIFactory.createButton("Multiplayer", skin, "button_red", () -> {
             Gdx.app.log("MainMenu", "Transition to Multiplayer");
         });
         table.add(multiplayerButton).padBottom(0).row();
@@ -110,7 +109,8 @@ public class MainMenuScreen extends BaseScreen {
 
     @Override
     public void dispose() {
-        // Destroy screen's assets here.
-        stage.dispose();
+        if (stage != null) stage.dispose();
+
+        if (backgroundTexture != null) backgroundTexture.dispose();
     }
 }

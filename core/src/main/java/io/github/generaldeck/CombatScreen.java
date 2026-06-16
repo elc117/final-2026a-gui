@@ -34,19 +34,17 @@ public class CombatScreen extends BaseScreen {
     }
 
     private void buildUI() {
-        // Botão "Desistir" no canto inferior esquerdo
-        TextButton retreatButton = UIFactory.createButton("Desistir", skin, () -> {
-            // TODO: voltar ao menu de seleção de nível
-            Gdx.app.log("CombatScreen", "Jogador desistiu");
-        });
 
         Table root = new Table();
         root.setFillParent(true);
         root.bottom().left();
-        root.add(retreatButton)
-            .pad(GameConfig.PAD_DEFAULT)
-            .width(GameConfig.BUTTON_WIDTH / 1.5f)
-            .height(GameConfig.BUTTON_HEIGHT);
+        // Botão "Desistir" no canto inferior esquerdo
+        TextButton retreatButton = UIFactory.createButton("Desistir", skin, "button_regular", () -> {
+            Gdx.app.log("CombatScreen", "Jogador desistiu");
+            game.changeScreen(new MainMenuScreen(game, skin));
+        });
+
+        root.add(retreatButton).pad(GameConfig.PAD_DEFAULT);
 
         stage.addActor(root);
     }
