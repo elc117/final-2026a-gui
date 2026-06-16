@@ -23,15 +23,11 @@ public class SelectLevelScreen extends BaseScreen {
     private void buildUI() {
         Table table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
         this.stage.addActor(table);
 
-        table.defaults()
-            .width(GameConfig.BUTTON_WIDTH)
-            .height(GameConfig.BUTTON_HEIGHT)
-            .padBottom(GameConfig.PAD_DEFAULT);
+        table.defaults().padBottom(GameConfig.PAD_DEFAULT);
 
-        TextButton level1Button = UIFactory.createButton("Level 1", skin, () -> {
+        TextButton level1Button = UIFactory.createButton("Level 1", skin, "default", () -> {
             Gdx.app.log("Level Select", "Transition to Level 1");
             GridManager playerGrid = new GridManager(GameConfig.GRID_COLS, GameConfig.GRID_ROWS);
 

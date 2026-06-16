@@ -1,200 +1,119 @@
 
 uiskin.png
-size: 256,128
+size: 2048, 2048
 format: RGBA8888
-filter: Linear,Linear
+filter: Linear, Linear
 repeat: none
-check-off
+blue_ribbon
   rotate: false
-  xy: 11, 5
-  size: 14, 14
-  orig: 14, 14
+  xy: 1223, 1723
+  size: 192, 64
+  split: 96, 95, 32, 31
+  orig: 192, 64
   offset: 0, 0
   index: -1
-textfield
+button_blue_9p
   rotate: false
-  xy: 11, 5
-  size: 14, 14
-  split: 3, 3, 3, 3
-  orig: 14, 14
+  xy: 1029, 1723
+  size: 192, 64
+  split: 94, 94, 32, 31
+  orig: 192, 64
   offset: 0, 0
   index: -1
-check-on
+button_blue_pressed_9p
   rotate: false
-  xy: 125, 35
-  size: 14, 14
-  orig: 14, 14
+  xy: 1537, 1959
+  size: 192, 64
+  split: 94, 95, 32, 31
+  orig: 192, 64
   offset: 0, 0
   index: -1
-cursor
+button_red_9p
   rotate: false
-  xy: 23, 1
-  size: 3, 3
-  split: 1, 1, 1, 1
-  orig: 3, 3
+  xy: 515, 1274
+  size: 192, 64
+  split: 94, 94, 32, 31
+  orig: 192, 64
   offset: 0, 0
   index: -1
-default
+button_red_9p_pressed
   rotate: false
-  xy: 1, 50
-  size: 254, 77
-  orig: 254, 77
+  xy: 1029, 1657
+  size: 192, 64
+  split: 94, 95, 32, 31
+  orig: 192, 64
   offset: 0, 0
   index: -1
-default-pane
+red_ribbon
   rotate: false
-  xy: 11, 1
-  size: 5, 3
-  split: 1, 1, 1, 1
-  orig: 5, 3
+  xy: 1537, 1893
+  size: 192, 64
+  split: 42, 41, 12, 21
+  pad: 96, 95, 32, 31
+  orig: 192, 64
   offset: 0, 0
   index: -1
-default-rect-pad
+slot
   rotate: false
-  xy: 11, 1
-  size: 5, 3
-  split: 1, 1, 1, 1
-  orig: 5, 3
+  xy: 515, 1080
+  size: 192, 192
+  split: 96, 95, 96, 95
+  orig: 192, 192
   offset: 0, 0
   index: -1
-default-pane-noborder
+smallburg-Italic
   rotate: false
-  xy: 170, 44
-  size: 1, 1
-  split: 0, 0, 0, 0
-  orig: 1, 1
+  xy: 515, 1340
+  size: 506, 92
+  orig: 506, 92
   offset: 0, 0
   index: -1
-default-rect
+smallburg-Italic(1)_0
   rotate: false
-  xy: 38, 25
-  size: 3, 3
-  split: 1, 1, 1, 1
-  orig: 3, 3
+  xy: 515, 1511
+  size: 512, 512
+  orig: 512, 512
   offset: 0, 0
   index: -1
-default-rect-down
+smallburg-Italic(1)_1
   rotate: false
-  xy: 170, 46
-  size: 3, 3
-  split: 1, 1, 1, 1
-  orig: 3, 3
+  xy: 1, 483
+  size: 512, 512
+  orig: 512, 512
   offset: 0, 0
   index: -1
-default-round
+smallburg-Regular
   rotate: false
-  xy: 112, 29
-  size: 12, 20
-  split: 5, 5, 5, 4
-  pad: 4, 4, 1, 1
-  orig: 12, 20
+  xy: 515, 1434
+  size: 506, 75
+  orig: 506, 75
   offset: 0, 0
   index: -1
-default-round-down
+smallburg-Regular(1)
   rotate: false
-  xy: 99, 29
-  size: 12, 20
-  split: 5, 5, 5, 4
-  pad: 4, 4, 1, 1
-  orig: 12, 20
+  xy: 1029, 1789
+  size: 506, 234
+  orig: 506, 234
   offset: 0, 0
   index: -1
-default-round-large
-  rotate: false
-  xy: 57, 29
-  size: 20, 20
-  split: 5, 5, 5, 4
-  orig: 20, 20
-  offset: 0, 0
-  index: -1
-default-scroll
-  rotate: false
-  xy: 78, 29
-  size: 20, 20
-  split: 2, 2, 2, 2
-  orig: 20, 20
-  offset: 0, 0
-  index: -1
-default-select
-  rotate: false
-  xy: 29, 29
-  size: 27, 20
-  split: 4, 14, 4, 4
-  orig: 27, 20
-  offset: 0, 0
-  index: -1
-default-select-selection
-  rotate: false
-  xy: 26, 16
-  size: 3, 3
-  split: 1, 1, 1, 1
-  orig: 3, 3
-  offset: 0, 0
-  index: -1
-default-slider
-  rotate: false
-  xy: 29, 20
-  size: 8, 8
-  split: 2, 2, 2, 2
-  orig: 8, 8
-  offset: 0, 0
-  index: -1
-default-slider-knob
+smallburg-Regular(2)
   rotate: false
   xy: 1, 1
-  size: 9, 18
-  orig: 9, 18
+  size: 506, 480
+  orig: 506, 480
   offset: 0, 0
   index: -1
-default-splitpane
+smallburg-Regular(3)_0
   rotate: false
-  xy: 17, 1
-  size: 5, 3
-  split: 0, 5, 0, 0
-  orig: 5, 3
+  xy: 1, 1511
+  size: 512, 512
+  orig: 512, 512
   offset: 0, 0
   index: -1
-default-splitpane-vertical
+smallburg-Regular(3)_1
   rotate: false
-  xy: 125, 29
-  size: 3, 5
-  split: 0, 0, 0, 5
-  orig: 3, 5
-  offset: 0, 0
-  index: -1
-default-window
-  rotate: false
-  xy: 1, 20
-  size: 27, 29
-  split: 4, 3, 20, 3
-  orig: 27, 29
-  offset: 0, 0
-  index: -1
-selection
-  rotate: false
-  xy: 174, 48
-  size: 1, 1
-  orig: 1, 1
-  offset: 0, 0
-  index: -1
-tree-minus
-  rotate: false
-  xy: 140, 35
-  size: 14, 14
-  orig: 14, 14
-  offset: 0, 0
-  index: -1
-tree-plus
-  rotate: false
-  xy: 155, 35
-  size: 14, 14
-  orig: 14, 14
-  offset: 0, 0
-  index: -1
-white
-  rotate: false
-  xy: 129, 31
-  size: 3, 3
-  orig: 3, 3
+  xy: 1, 997
+  size: 512, 512
+  orig: 512, 512
   offset: 0, 0
   index: -1

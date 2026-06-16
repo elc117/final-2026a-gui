@@ -1,71 +1,151 @@
 {
-  BitmapFont: { default-font: { file: default.fnt } },
-  Color: {
-    green: { a: 1, b: 0, g: 1, r: 0 },
-    white: { a: 1, b: 1, g: 1, r: 1 },
-    red: { a: 1, b: 0, g: 0, r: 1 },
-    black: { a: 1, b: 0, g: 0, r: 0 },
-    gray: { a: 1, b: 0.8, g: 0.8, r: 0.8 },
-  },
-  TintedDrawable: {
-    dialogDim: { name: white, color: { r: 0, g: 0, b: 0, a: 0.45 } },
-  },
-  ButtonStyle: {
-    default: { down: default-round-down, up: default-round, disabled: default-round },
-    toggle: { parent: default, checked: default-round-down }
-  },
-  TextButtonStyle: {
-    default: { parent: default, font: default-font, fontColor: white, disabledFontColor: gray },
-    toggle: { parent: default, checked: default-round-down, downFontColor: red }
-  },
-  ScrollPaneStyle: {
-    default: { vScroll: default-scroll, hScrollKnob: default-round-large, background: default-rect, hScroll: default-scroll, vScrollKnob: default-round-large }
-  },
-  SelectBoxStyle: {
-    default: {
-      font: default-font, fontColor: white, background: default-select,
-      scrollStyle: default,
-      listStyle: { font: default-font, selection: default-select-selection }
-    }
-  },
-  SplitPaneStyle: {
-    default-vertical: { handle: default-splitpane-vertical },
-    default-horizontal: { handle: default-splitpane }
-  },
-  WindowStyle: {
-    default: { titleFont: default-font, background: default-window, titleFontColor: white },
-    dialog: { parent: default, stageBackground: dialogDim }
-  },
-  ProgressBarStyle: {
-    default-horizontal: { background: default-slider, knob: default-slider-knob },
-    default-vertical: { background: default-slider, knob: default-round-large }
-  },
-  SliderStyle: {
-    default-horizontal: { parent: default-horizontal },
-    default-vertical: { parent: default-vertical }
-  },
-  LabelStyle: {
-    default: { font: default-font, fontColor: white }
-  },
-  TextFieldStyle: {
-    default: { selection: selection, background: textfield, font: default-font, fontColor: white, cursor: cursor }
-  },
-  CheckBoxStyle: {
-    default: { checkboxOn: check-on, checkboxOff: check-off, font: default-font, fontColor: white }
-  },
-  ListStyle: {
-    default: { fontColorUnselected: white, selection: selection, fontColorSelected: white, font: default-font }
-  },
-  TouchpadStyle: {
-    default: { background: default-pane, knob: default-round-large }
-  },
-  TreeStyle: {
-    default: { minus: tree-minus, plus: tree-plus, selection: default-select-selection }
-  },
-  TextTooltipStyle: {
-    default: {
-      label: { font: default-font, fontColor: white },
-      background: default-pane, wrapWidth: 150
-    }
-  },
+com.badlogic.gdx.graphics.g2d.BitmapFont: {
+	font_regular: {
+		file: smallburg-Regular(1).fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_small: {
+		file: smallburg-Regular.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_small_italic: {
+		file: smallburg-Italic.fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_title: {
+		file: smallburg-Regular(3).fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	font_title_italic: {
+		file: smallburg-Italic(1).fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+	smallburg-large: {
+		file: smallburg-Regular(2).fnt
+		scaledSize: -1
+		markupEnabled: false
+		flip: false
+	}
+}
+com.badlogic.gdx.graphics.Color: {
+	black: {
+		r: 0
+		g: 0
+		b: 0
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
+	button_blue_9p_over: {
+		name: button_blue_9p
+		color: {
+			r: 0.8509804
+			g: 0.8509804
+			b: 0.8509804
+			a: 0.98876333
+		}
+	}
+	button_red_9p_over: {
+		name: button_red_9p
+		color: {
+			r: 0.85882354
+			g: 0.85882354
+			b: 0.85882354
+			a: 1
+		}
+	}
+	slot_tinted: {
+		name: slot
+		color: {
+			r: 0.5803922
+			g: 0.5803922
+			b: 0.5803922
+			a: 1
+		}
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: {
+		font: smallburg-large
+		fontColor: black
+	}
+	title: {
+		font: font_title
+		fontColor: black
+	}
+	small: {
+		font: font_small
+		fontColor: black
+	}
+	title_italic: {
+		font: font_title_italic
+		fontColor: black
+	}
+	small_italic: {
+		font: font_small_italic
+		fontColor: black
+	}
+	text_blue_ribbon: {
+		font: smallburg-large
+		fontColor: black
+		background: blue_ribbon
+	}
+	text_red_ribbon: {
+		font: smallburg-large
+		fontColor: black
+		background: red_ribbon
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {
+		font: smallburg-large
+		fontColor: black
+		up: button_blue_9p
+		down: button_blue_pressed_9p
+		over: button_blue_9p_over
+	}
+	button_red: {
+		font: smallburg-large
+		fontColor: black
+		up: button_red_9p
+		down: button_red_9p_pressed
+		over: button_red_9p_over
+	}
+	button_regular: {
+		font: font_regular
+		fontColor: black
+		up: button_blue_9p
+		down: button_blue_pressed_9p
+		over: button_blue_9p_over
+	}
+	button_regular_red: {
+		font: font_regular
+		fontColor: black
+		up: button_red_9p
+		down: button_red_9p_pressed
+		over: button_red_9p_over
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+	default: {
+		background: slot
+		titleFont: font_regular
+		titleFontColor: black
+	}
+}
 }
