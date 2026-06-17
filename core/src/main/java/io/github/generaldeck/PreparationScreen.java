@@ -1,16 +1,22 @@
 package io.github.generaldeck;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.graphics.Texture;
+
+import static com.badlogic.gdx.scenes.scene2d.Touchable.enabled;
 
 public class PreparationScreen extends BaseScreen {
     private final Stage stage;
@@ -20,6 +26,8 @@ public class PreparationScreen extends BaseScreen {
     private final Skin skin;
     private final String[][] enemyGrid;
     private final int currentLevel;
+
+    private Texture backgroundTexture;
 
     public PreparationScreen(Main game, Skin skin, GridManager gridManager, int level) {
         super(game);
@@ -34,6 +42,11 @@ public class PreparationScreen extends BaseScreen {
         this.currentLevel = level;
 
         this.enemyGrid = LevelManager.getEnemyCampaignFormation(level, gridManager.getCols(), gridManager.getRows());
+
+        backgroundTexture = new Texture(Gdx.files.internal("Background_Combate.png")); // POR O NEGOCIO AQUI!!!!
+        Image bgImage = new Image(backgroundTexture);
+        bgImage.setFillParent(true);
+        this.stage.addActor(bgImage);
 
         buildUI();
     }
@@ -53,10 +66,10 @@ public class PreparationScreen extends BaseScreen {
         gridsContainer.add(playerGridTable).padRight(50);
         gridsContainer.add(enemyGridTable).padRight(50);
 
-        rootTable.add(new Label("Nível " + currentLevel, skin)).padBottom(20).row();
-        rootTable.add(gridsContainer).expand().center().row();
+        Label titleLabel = new Label("Nível " + currentLevel, skin, "text_blue_ribbon");
+        rootTable.add(titleLabel).padBottom(40).row();
 
-        // não sei se faz muito sentido usar gameconfig.pad_default aqui ou só deixar um número mágico
+        rootTable.add(gridsContainer).expand().center().row();
         rootTable.add(paletteTable).padBottom(GameConfig.PAD_DEFAULT).bottom().row();
         rootTable.add(startButton).padTop(GameConfig.PAD_DEFAULT).padBottom(GameConfig.PAD_DEFAULT).row();
     }
@@ -70,26 +83,14 @@ public class PreparationScreen extends BaseScreen {
             for (int x = 0; x < cols; x++) {
                 Table cell = new Table();
 
+                //cell.setBackground(skin.getDrawable("")); // lembrar de fazer o fundo
+
                 // LÓGICA DE ESPELHAMENTO VISUAL
                 int mirroredX = (cols - 1) - x;
                 String unitType = enemyGrid[mirroredX][y];
 
                 if (unitType != null) {
-                    Image enemyImg;
-
-                    // 1. Escolhemos a arte correta no Gestor de Animações
-                    if ("WARRIOR".equals(unitType)) {
-                        enemyImg = new Image(AnimationManager.warriorIcon);
-                    } else {
-                        enemyImg = new Image(AnimationManager.archerIcon);
-                    }
-
-                    // 2. Aplicamos as regras de escala para o desenho crescer livremente
-                    enemyImg.setScaling(com.badlogic.gdx.utils.Scaling.stretch);
-                    enemyImg.setSize(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
-                    enemyImg.setOrigin(GameConfig.TILE_SIZE / 2f, GameConfig.TILE_SIZE / 2f);
-
-                    // 3. Removemos o preenchimento e travamos o tamanho interno
+                    Image enemyImg = createUnitImage(unitType, GameConfig.TILE_SIZE);
                     cell.add(enemyImg).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
                 }
 
@@ -111,10 +112,11 @@ public class PreparationScreen extends BaseScreen {
         for (int y = rows - 1; y >= 0; y--) {
             for (int x = 0; x < cols; x++) {
                 Table cell = new Table();
+                // cell.setBackground(skin.getDrawable("fundo_celula")); // LEMBRAR DE FAZER ISSSOO
+                cell.setTouchable(enabled);
                 cell.setDebug(true); // MODO DEBUG !!!!
-                gridTable.add(cell).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
+                gridTable.add(cell).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE).fill();
 
-                // Extraímos a lógica pesada do Drag & Drop para outro método!
                 setupDragAndDropTarget(cell, x, y);
             }
             gridTable.row();
@@ -127,11 +129,7 @@ public class PreparationScreen extends BaseScreen {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 String[][] gridState = gridManager.getGridState();
-                if (gridState[cellX][cellY] != null) {
-                    Gdx.app.log("Erro", "Já existe uma tropa posicionada aqui");
-                    return false;
-                }
-                return true;
+                return gridState[cellX][cellY] == null;
             }
 
             @Override
@@ -142,17 +140,8 @@ public class PreparationScreen extends BaseScreen {
                 Table targetCell = (Table) getActor();
                 targetCell.clearChildren();
 
-                Image placedImage;
-                if ("WARRIOR".equals(unitType)) {
-                    placedImage = new Image(AnimationManager.warriorIcon);
-                } else {
-                    placedImage = new Image(AnimationManager.archerIcon);
-                }
-
-                placedImage.setScaling(com.badlogic.gdx.utils.Scaling.stretch);
-                placedImage.setSize(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
-                placedImage.setOrigin(GameConfig.TILE_SIZE / 2f, GameConfig.TILE_SIZE / 2f);
-                placedImage.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
+                Image placedImage = createUnitImage(unitType, GameConfig.TILE_SIZE);
+                placedImage.setTouchable(Touchable.disabled);
 
                 targetCell.add(placedImage).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
             }
@@ -161,87 +150,57 @@ public class PreparationScreen extends BaseScreen {
 
     private Table createPaletteTable() {
         Table paletteTable = new Table();
-        paletteTable.add(new Label("Arraste as tropas para o tabuleiro:", skin))
-            .colspan(2)
-            .padBottom(GameConfig.PAD_SMALL)
-            .row();
+        Label instLabel = new Label("Arraste as tropas para o tabuleiro:", skin, "small");
+        paletteTable.add(instLabel).colspan(2).padBottom(GameConfig.PAD_SMALL).row();
 
-        paletteTable.add(createDraggableUnit("WARRIOR"))
-            .size(GameConfig.UNIT_ICON_SIZE)
-            .padRight(GameConfig.PAD_DEFAULT);
-
-        paletteTable.add(createDraggableUnit("ARCHER"))
-            .size(GameConfig.UNIT_ICON_SIZE);
-
+        paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(GameConfig.PAD_DEFAULT);
+        paletteTable.add(createDraggableUnit("ARCHER")).size(GameConfig.UNIT_ICON_SIZE);
         return paletteTable;
     }
 
     private TextButton createStartButton() {
-        return UIFactory.createButton("Iniciar Combate", skin, () -> {
+        return UIFactory.createButton("Iniciar Combate", skin, "button_regular", () -> {
             String[][] playerFormation = gridManager.getGridState();
-            // Passa o skin para o CombatScreen agora
             game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid));
         });
     }
 
-    private com.badlogic.gdx.scenes.scene2d.ui.Table createDraggableUnit(final String unitType) {
+    private Table createDraggableUnit(final String unitType) {
+        Table container = new Table();
 
-        com.badlogic.gdx.scenes.scene2d.ui.Table container = new com.badlogic.gdx.scenes.scene2d.ui.Table();
+        Image icon = createUnitImage(unitType, GameConfig.UNIT_ICON_SIZE);
+        String nomePersonagem = "WARRIOR".equals(unitType) ? "Soldado" : "Arqueiro";
 
-        Image icon;
-        String nomePersonagem;
-
-        if ("WARRIOR".equals(unitType)) {
-            icon = new Image(AnimationManager.warriorIcon);
-            nomePersonagem = "Soldado";
-        } else {
-            icon = new Image(AnimationManager.archerIcon);
-            nomePersonagem = "Arqueiro";
-        }
-
-        icon.setScaling(com.badlogic.gdx.utils.Scaling.stretch);
-        icon.setSize(GameConfig.UNIT_ICON_SIZE, GameConfig.UNIT_ICON_SIZE);
-        icon.setOrigin(GameConfig.UNIT_ICON_SIZE / 2f, GameConfig.UNIT_ICON_SIZE / 2f);
-        icon.setScale(1f);
-
-        // 3. Adicionamos a lógica de arrastar APENAS na imagem, para você puxar pelo desenho
         dragAndDrop.addSource(new DragAndDrop.Source(icon) {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
                 payload.setObject(unitType);
 
-                Image dragImage;
-                if ("WARRIOR".equals(unitType)) {
-                    dragImage = new Image(AnimationManager.warriorIcon);
-                } else {
-                    dragImage = new Image(AnimationManager.archerIcon);
-                }
-
-                dragImage.setScaling(com.badlogic.gdx.utils.Scaling.stretch);
-                dragImage.setSize(GameConfig.UNIT_ICON_SIZE, GameConfig.UNIT_ICON_SIZE);
-                dragImage.setOrigin(GameConfig.UNIT_ICON_SIZE / 2f, GameConfig.UNIT_ICON_SIZE / 2f);
-
+                Image dragImage = createUnitImage(unitType, GameConfig.UNIT_ICON_SIZE);
                 payload.setDragActor(dragImage);
 
-                dragAndDrop.setDragActorPosition(
-                    GameConfig.UNIT_ICON_SIZE / 2f,
-                    -(GameConfig.UNIT_ICON_SIZE / 2f)
-                );
-
+                dragAndDrop.setDragActorPosition(GameConfig.UNIT_ICON_SIZE / 2f, -(GameConfig.UNIT_ICON_SIZE / 2f));
                 return payload;
             }
         });
 
-        // 4. Criamos o Texto (Label) usando o Skin do seu jogo
-        com.badlogic.gdx.scenes.scene2d.ui.Label label = new com.badlogic.gdx.scenes.scene2d.ui.Label(nomePersonagem, skin);
-        label.setAlignment(com.badlogic.gdx.utils.Align.center);
+        Label label = new Label(nomePersonagem, skin, "small");
+        label.setAlignment(Align.center);
 
-        // 5. Montamos o layout: Imagem em cima, espaço extra embaixo, e o Texto na nova linha
-        container.add(icon).size(GameConfig.UNIT_ICON_SIZE).padBottom(-40f).row();
+        container.add(icon).size(GameConfig.UNIT_ICON_SIZE).padBottom(-20f).row();
         container.add(label).expandX().fillX();
 
         return container;
+    }
+
+    private Image createUnitImage(String unitType, float size) {
+        Drawable region = "WARRIOR".equals(unitType) ? AnimationManager.warriorIcon : AnimationManager.archerIcon;
+        Image img = new Image(region);
+        img.setScaling(Scaling.stretch);
+        img.setSize(size, size);
+        img.setOrigin(size / 2f, size / 2f);
+        return img;
     }
 
     @Override
