@@ -263,11 +263,6 @@ public class PreparationScreen extends BaseScreen {
     }
 
     @Override
-    public void hide() {
-        Gdx.input.setInputProcessor(null);
-    }
-
-    @Override
     public void dispose() {
         stage.dispose();
     }

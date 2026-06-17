@@ -69,7 +69,7 @@ public class AnimationManager {
         // ARCHER SHOOT
         TextureRegion[][] aaFrames = TextureRegion.split(archerShootSheet,
             archerShootSheet.getWidth() / ARCHER_SHOOT_FRAMES, archerShootSheet.getHeight());
-        archerShoot = new Animation<>(0.4f, aaFrames[0]);
+        archerShoot = new Animation<>(0.6f, aaFrames[0]);
         archerShoot.setPlayMode(Animation.PlayMode.NORMAL);
 
         // icone de guerreirro

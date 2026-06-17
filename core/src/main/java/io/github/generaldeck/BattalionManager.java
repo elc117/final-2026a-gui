@@ -374,7 +374,7 @@ public class BattalionManager {
                     float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
 
                     // SPAWNA AS UNIDADES
-                    spawnSquad(unitType, worldX, worldY, 60, team);
+                    spawnSquad(unitType, worldX, worldY, 30, team);
                 }
             }
         }
@@ -395,10 +395,6 @@ public class BattalionManager {
         // DESENHA TROPAS
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
-
-            if (unit.isRanged && !"ARCHER".equals(unit.type)) {
-                Gdx.app.error("BUG CRÍTICO", "Arqueiro sofreu mutação! O tipo agora é: " + unit.type + " | Time: " + unit.team);
-            }
 
             // Escolhe a animação correta
             Animation<TextureRegion> anim;
@@ -447,5 +443,16 @@ public class BattalionManager {
                 );
             }
         }
+    }
+
+    // NÃO PRECISA DE OVERRIDE
+    public void dispose() {
+        // esvazia o array de unidade e projeteis ativos
+        activeUnits.clear();
+        activeProjectiles.clear();
+
+        // esvazia as pool
+        unitPool.clear();
+        projectilePool.clear();
     }
 }
