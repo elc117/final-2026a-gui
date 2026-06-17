@@ -90,13 +90,10 @@ public class CombatScreen extends BaseScreen {
     }
 
     @Override
-    public void hide() {
-        Gdx.input.setInputProcessor(null);
-    }
-
-    @Override
     public void dispose() {
         batch.dispose();
         stage.dispose();
+
+        battalionManager.dispose();
     }
 }

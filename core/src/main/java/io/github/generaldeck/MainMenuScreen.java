@@ -92,22 +92,6 @@ public class MainMenuScreen extends BaseScreen {
     }
 
     @Override
-    public void pause() {
-        // Invoked when your application is paused.
-    }
-
-    @Override
-    public void resume() {
-        // Invoked when your application is resumed after pause.
-    }
-
-    @Override
-    public void hide() {
-        // This method is called when another screen replaces this one.
-        Gdx.input.setInputProcessor(null);
-    }
-
-    @Override
     public void dispose() {
         if (stage != null) stage.dispose();
 
