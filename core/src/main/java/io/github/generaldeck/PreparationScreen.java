@@ -52,7 +52,6 @@ public class PreparationScreen extends BaseScreen {
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
-        //rootTable.setDebug(true); // MODO DEBUG !!!!
         stage.addActor(rootTable);
 
         Table playerGridTable = createGridTable();
@@ -118,9 +117,8 @@ public class PreparationScreen extends BaseScreen {
         for (int y = rows - 1; y >= 0; y--) {
             for (int x = 0; x < cols; x++) {
                 Table cell = new Table();
-                cell.setBackground(cellTeste); // LEMBRAR DE FAZER ISSSOO
+                cell.setBackground(cellTeste);
                 cell.setTouchable(enabled);
-                //cell.setDebug(true); // MODO DEBUG !!!!
                 gridTable.add(cell).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE).fill();
 
                 setupDragAndDropTarget(cell, x, y);
@@ -175,7 +173,17 @@ public class PreparationScreen extends BaseScreen {
         Table container = new Table();
 
         Image icon = createUnitImage(unitType, GameConfig.UNIT_ICON_SIZE);
-        String nomePersonagem = "WARRIOR".equals(unitType) ? "Soldado" : "Arqueiro";
+        String nomePersonagem;
+        switch(unitType) {
+            case "WARRIOR":
+                nomePersonagem = "Soldado";
+                break;
+            case "ARCHER":
+                nomePersonagem = "Arqueiro";
+                break;
+            default:
+                nomePersonagem = "Erro";
+        }
 
         dragAndDrop.addSource(new DragAndDrop.Source(icon) {
             @Override
@@ -201,7 +209,18 @@ public class PreparationScreen extends BaseScreen {
     }
 
     private Image createUnitImage(String unitType, float size) {
-        Drawable region = "WARRIOR".equals(unitType) ? AnimationManager.warriorIcon : AnimationManager.archerIcon;
+        Drawable region;
+        switch(unitType) {
+            case "WARRIOR":
+                region = AnimationManager.warriorIcon;
+                break;
+            case "ARCHER":
+                region = AnimationManager.archerIcon;
+                break;
+            default:
+                region = AnimationManager.warriorIcon;
+                break;
+        }
         Image img = new Image(region);
         img.setScaling(Scaling.stretch);
         img.setSize(size, size);

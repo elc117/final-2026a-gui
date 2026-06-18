@@ -49,9 +49,6 @@ public class BattalionManager {
         Projectile proj = projectilePool.obtain();
         proj.init(shooter.position.x, shooter.position.y, target.position.x, target.position.y, shooter.damage, shooter.team);
         activeProjectiles.add(proj);
-
-        // CÂMARA 1
-        //Gdx.app.log("DEBUG", "Flecha CRIADA! Atirador: Time " + shooter.team + " | PosX: " + shooter.position.x);
     }
 
     private void applyDamage(Unit target, float damage) {
@@ -157,9 +154,6 @@ public class BattalionManager {
 
                 if (distSq <= hitRadiusSq) {
                     applyDamage(potentialTarget, proj.damage);
-
-                    // CÂMARA 3
-                    //Gdx.app.log("DEBUG", "Flecha ACERTOU o alvo! Dano: " + proj.damage + " | Time atingido: " + potentialTarget.team);
 
                     hitSomebody = true;
                     break;
@@ -398,10 +392,15 @@ public class BattalionManager {
 
             // Escolhe a animação correta
             Animation<TextureRegion> anim;
-            if ("ARCHER".equals(unit.type)) {
-                anim = unit.isAttacking ? AnimationManager.archerShoot : AnimationManager.archerRun;
-            } else {
-                anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;
+            switch(unit.type) {
+                case "ARCHER":
+                    anim = unit.isAttacking ? AnimationManager.archerShoot : AnimationManager.archerRun;
+                    break;
+                case "WARRIOR":
+                    anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;
+                    break;
+                default:
+                    anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;
             }
 
             TextureRegion frame;
