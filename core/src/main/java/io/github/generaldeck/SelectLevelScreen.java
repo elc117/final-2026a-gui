@@ -39,7 +39,6 @@ public class SelectLevelScreen extends BaseScreen {
 
     @Override
     public void show() {
-        // REGRA DE OURO DA UI: Diz ao jogo para ouvir os cliques dos botões deste Stage
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -64,7 +63,6 @@ public class SelectLevelScreen extends BaseScreen {
 
     @Override
     public void dispose() {
-        // REGRA DE OURO DA MEMÓRIA: Destruir o Stage quando não for mais precisar
         if (stage != null) {
             stage.dispose();
         }

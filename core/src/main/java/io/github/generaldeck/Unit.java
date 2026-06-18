@@ -86,6 +86,5 @@ public class Unit implements Pool.Poolable {
         isAttacking      = false;
         animTime         = 0f;
         attackLockTimer  = 0f;
-        //Gdx.app.log("Sistema de Pool", "Uma unidade morreu e o reset() foi chamado com sucesso!");
     }
 }
