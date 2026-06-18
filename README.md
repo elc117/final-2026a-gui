@@ -2,12 +2,16 @@
 
 # Auto-Battler (Trabalho Final)
 
-### Coisas para fazer:
-* (Resolvido) Resolver bug de acesso fora da matriz: na PreparationScreen, jogo crasha quando insere tropa nas linhas do topo.
-* Tem um bug que crasha o jogo caso o grid do GameConfig não seja um quadrado.
-* Começar a pensar em gráficos e spritesheets dos personagens
-* Começar a pensar nas cartas de habilidade
-* Refatorar códigos que não estão muito claros
+### Coisas para fazer (ordem de prioridade):
+1. Sistema de dinheiro (jogador precisa comprar as tropas, limite de dinheiro por nível)
+2. Refatorar o código implementar mais unidades
+3. Unidades diferentes (mago, healer, ladino, etc)
+4. Unidades serem spawnadas em formações diferentes (ex: arqueiro nascem em linha, guerreiros nascem em blocos)
+5. Time inimigo com cor oposta (no tinyswords tem a mesma sprite mas vermelha)
+6. CARTAS DE HABILIDADE!!! Que mudam o comportamento das tropas, dano, efeitos
+7. Adição de efeitos visuais para as cartas, como unidades em chama, congeladas, fugindo.
+8. Sistema para avanço de nível
+9. MULTIPLAYER
 
 ## Progresso 08/06
 Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisitos de ambiente e as diretrizes de visualização para a web.
@@ -47,3 +51,24 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Adicionado background na tela de combate.
 * Adicionado sprites de arqueiro e soldado, com animações na região de combate.
 * Implementado lógica de animação para espelhar o sprite horizontalmente dependendo a direção do movimento.
+* Classe `Projectiles` para as flechas dos arqueiros e magias no futuro
+
+## Progresso 15/06
+**O que foi feito:**
+* Começando a prototipar as interfaces
+* Uso do programa SkinManager para fazer uma skin
+* Skin nova para os elementos da UI
+* Prototipação dos menus
+
+## Progresso 16/06
+**O que foi feito:**
+* Implementação das interfaces
+* Arrumando alguns erros do código e vazamentos de memória
+* Algumas refatorações
+
+## Progresso 17/06
+**O que foi feito:**
+* Terminando de criar as interfaces
+* Começando a deixar o jogo mais divertido de jogar
+* 
+
