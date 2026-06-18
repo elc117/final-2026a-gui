@@ -21,10 +21,19 @@ public class GridManager {
         }
     }
 
+    public void removeBattalion(int x, int y) {
+        String[][] gridState = getGridState();
+        if (x >= 0 && x < getCols() && y >= 0 && y < getRows()) {
+            gridState[x][y] = null;
+        }
+    }
+
     public String[][] getGridState() {
         return gridState;
     }
 
     public int getCols() { return cols; }
     public int getRows() { return rows; }
+
+
 }

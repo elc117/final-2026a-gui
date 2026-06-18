@@ -87,4 +87,12 @@ public class Unit implements Pool.Poolable {
         animTime         = 0f;
         attackLockTimer  = 0f;
     }
+
+    public static int getCost(String type) {
+        switch(type) {
+            case "WARRIOR": return 100;
+            case "ARCHER":  return 150;
+            default:        return 0; // Fallback de segurança
+        }
+    }
 }

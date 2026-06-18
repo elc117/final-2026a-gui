@@ -18,4 +18,12 @@ public class LevelManager {
         }
         return enemyFormation;
     }
+
+    public static int getLevelBudget(int level) {
+        switch(level) {
+            case 1:  return 300;
+            case 2:  return 500;
+            default: return 200; // Orçamento base de segurança
+        }
+    }
 }
