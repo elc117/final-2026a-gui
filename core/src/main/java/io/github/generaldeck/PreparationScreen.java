@@ -1,20 +1,18 @@
 package io.github.generaldeck;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import static com.badlogic.gdx.scenes.scene2d.Touchable.enabled;
 
@@ -43,18 +41,18 @@ public class PreparationScreen extends BaseScreen {
 
         this.enemyGrid = LevelManager.getEnemyCampaignFormation(level, gridManager.getCols(), gridManager.getRows());
 
-        backgroundTexture = new Texture(Gdx.files.internal("Background_Combate.png")); // POR O NEGOCIO AQUI!!!!
-        Image bgImage = new Image(backgroundTexture);
-        bgImage.setFillParent(true);
-        this.stage.addActor(bgImage);
-
         buildUI();
     }
 
     private void buildUI() {
+        backgroundTexture = new Texture(Gdx.files.internal("background_preparation.png")); // POR O NEGOCIO AQUI!!!!
+        Image bgImage = new Image(backgroundTexture);
+        bgImage.setFillParent(true);
+        stage.addActor(bgImage);
+
         Table rootTable = new Table();
         rootTable.setFillParent(true);
-        rootTable.setDebug(true); // MODO DEBUG !!!!
+        //rootTable.setDebug(true); // MODO DEBUG !!!!
         stage.addActor(rootTable);
 
         Table playerGridTable = createGridTable();
@@ -67,7 +65,7 @@ public class PreparationScreen extends BaseScreen {
         gridsContainer.add(enemyGridTable).padRight(50);
 
         Label titleLabel = new Label("Nível " + currentLevel, skin, "text_blue_ribbon");
-        rootTable.add(titleLabel).padBottom(40).row();
+        rootTable.add(titleLabel).padBottom(0).row();
 
         rootTable.add(gridsContainer).expand().center().row();
         rootTable.add(paletteTable).padBottom(GameConfig.PAD_DEFAULT).bottom().row();
@@ -79,11 +77,15 @@ public class PreparationScreen extends BaseScreen {
         int cols = enemyGrid.length;
         int rows = enemyGrid[0].length;
 
+        // da pra adicionar isso no skin mais pra frente
+        Texture textureTeste = new Texture(Gdx.files.internal("celula_teste_red.png"));
+        TextureRegionDrawable cellTeste = new TextureRegionDrawable(new TextureRegion(textureTeste));
+
         for (int y = rows - 1; y >= 0; y--) {
             for (int x = 0; x < cols; x++) {
                 Table cell = new Table();
 
-                //cell.setBackground(skin.getDrawable("")); // lembrar de fazer o fundo
+                cell.setBackground(cellTeste);
 
                 // LÓGICA DE ESPELHAMENTO VISUAL
                 int mirroredX = (cols - 1) - x;
@@ -104,17 +106,21 @@ public class PreparationScreen extends BaseScreen {
 
     private Table createGridTable() {
         Table gridTable = new Table();
-        gridTable.setDebug(true); // MODO DEBUG !!!!
+        //gridTable.setDebug(true); // MODO DEBUG !!!!
 
         int cols = gridManager.getCols();
         int rows = gridManager.getRows();
 
+        // da pra adicionar isso no skin mais pra frente
+        Texture textureTeste = new Texture(Gdx.files.internal("celula_teste.png"));
+        TextureRegionDrawable cellTeste = new TextureRegionDrawable(new TextureRegion(textureTeste));
+
         for (int y = rows - 1; y >= 0; y--) {
             for (int x = 0; x < cols; x++) {
                 Table cell = new Table();
-                // cell.setBackground(skin.getDrawable("fundo_celula")); // LEMBRAR DE FAZER ISSSOO
+                cell.setBackground(cellTeste); // LEMBRAR DE FAZER ISSSOO
                 cell.setTouchable(enabled);
-                cell.setDebug(true); // MODO DEBUG !!!!
+                //cell.setDebug(true); // MODO DEBUG !!!!
                 gridTable.add(cell).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE).fill();
 
                 setupDragAndDropTarget(cell, x, y);
@@ -151,7 +157,7 @@ public class PreparationScreen extends BaseScreen {
     private Table createPaletteTable() {
         Table paletteTable = new Table();
         Label instLabel = new Label("Arraste as tropas para o tabuleiro:", skin, "small");
-        paletteTable.add(instLabel).colspan(2).padBottom(GameConfig.PAD_SMALL).row();
+        paletteTable.add(instLabel).colspan(2).row();
 
         paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(GameConfig.PAD_DEFAULT);
         paletteTable.add(createDraggableUnit("ARCHER")).size(GameConfig.UNIT_ICON_SIZE);
