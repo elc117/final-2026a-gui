@@ -1,19 +1,19 @@
 package io.github.generaldeck;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.graphics.g2d.Animation;
 
 import static com.badlogic.gdx.scenes.scene2d.Touchable.enabled;
 
@@ -26,6 +26,9 @@ public class PreparationScreen extends BaseScreen {
     private final int currentLevel;
     private int currentFunds;
     private Label fundsLabel;
+    private Texture coinTexture;
+
+    private Table detailsCard;
 
     private Texture backgroundTexture;
 
@@ -65,22 +68,104 @@ public class PreparationScreen extends BaseScreen {
         gridsContainer.add(playerGridTable).padRight(50);
         gridsContainer.add(enemyGridTable).padRight(50);
 
+        // O cabeçalho agora fica super limpo, apenas com o título do Nível centralizado
         Table headerTable = new Table();
         Label titleLabel = new Label("Nível " + currentLevel, skin, "text_blue_ribbon");
-        fundsLabel = new Label("Ouro: " + currentFunds, skin, "text_blue_ribbon");
+        headerTable.add(titleLabel).expandX().center().padTop(20);
 
-        headerTable.add(titleLabel).expandX().left().padLeft(GameConfig.PAD_DEFAULT);
-        headerTable.add(fundsLabel).expandX().right().padRight(GameConfig.PAD_DEFAULT);
+        // --- PREPARAÇÃO DO PAINEL FIXO DE INFORMAÇÕES (CENTRO) ---
+        detailsCard = new Table();
+        detailsCard.setBackground(skin.get("button_regular", TextButton.TextButtonStyle.class).up);
+        updateDetailsCard(null);
 
+        // --- MONTAGEM DA INTERFACE CENTRAL ---
         rootTable.add(headerTable).fillX().padBottom(GameConfig.PAD_DEFAULT).row();
         rootTable.add(gridsContainer).expand().center().row();
-        rootTable.add(paletteTable).padBottom(GameConfig.PAD_DEFAULT).bottom().row();
-        rootTable.add(startButton).padTop(GameConfig.PAD_DEFAULT).padBottom(GameConfig.PAD_DEFAULT).row();
+        rootTable.add(paletteTable).padBottom(15f).row();
+        rootTable.add(detailsCard).size(650, 125).padBottom(GameConfig.PAD_DEFAULT);
+
+        // --- NOVA CAMADA FLUTUANTE (OVERLAY) PARA OS CANTOS INFERIORES ---
+        Table overlayTable = new Table();
+        overlayTable.setFillParent(true);
+        overlayTable.bottom();
+
+        // 1. Caixa de Ouro (Canto Esquerdo)
+        coinTexture = new Texture(Gdx.files.internal("Icon_03.png")); // Carrega o seu ícone
+        Image coinImg = new Image(coinTexture);
+
+        Table fundsBox = new Table();
+        fundsBox.setBackground(skin.get("button_regular", TextButton.TextButtonStyle.class).up);
+        // Padding para deixar a caixa pequenininha e justa ao redor da moeda
+        fundsBox.pad(5f).padLeft(15f).padRight(20f);
+
+        // Usamos a fonte menor e damos um leve zoom
+        fundsLabel = new Label(String.valueOf(currentFunds), skin, "small");
+        fundsLabel.setFontScale(1.3f);
+
+        fundsBox.add(coinImg).size(36, 36).padRight(10); // Tamanho da moeda
+        fundsBox.add(fundsLabel);
+
+        overlayTable.add(fundsBox).padBottom(30).padLeft(30).left();
+
+        // Empurra o próximo item (o botão de combate) tudo para a direita
+        overlayTable.add().expandX();
+
+        // 2. Botão Iniciar Combate (Canto Direito)
+        overlayTable.add(startButton).size(240, 75).padBottom(30).padRight(30).right();
+
+        stage.addActor(overlayTable);
     }
 
-    // Méto\do corrigido: movido para fora do buildUI()
+    private void updateDetailsCard(String unitType) {
+        detailsCard.clearChildren();
+
+        if (unitType == null) {
+            Label hint = new Label("Passe o mouse sobre uma tropa para ver os detalhes", skin, "small");
+            detailsCard.add(hint).center();
+            return;
+        }
+
+        String nome = ""; String desc = ""; int hp = 0, dano = 0, cura = 0;
+        int custo = Unit.getCost(unitType);
+        Animation<TextureRegion> anim = null;
+
+        switch (unitType) {
+            case "WARRIOR":
+                nome = "Soldado"; desc = "Infantaria. Alta resistência para a linha de frente.";
+                hp = 140; dano = 10; anim = AnimationManager.warriorIdle; break;
+            case "ARCHER":
+                nome = "Arqueiro"; desc = "Atirador. Dano massivo, mas frágil.";
+                hp = 70; dano = 15; anim = AnimationManager.archerIdle; break;
+            case "MONK":
+                nome = "Monge"; desc = "Suporte. Cura os aliados mais feridos no combate.";
+                hp = 80; cura = 25; anim = AnimationManager.monkIdle; break;
+        }
+
+        AnimatedImage img = new AnimatedImage(anim);
+        img.setScaling(Scaling.fit);
+
+        Table textTable = new Table();
+
+        Label nameLabel = new Label(nome + " (" + custo + " Ouro)", skin, "small");
+        nameLabel.setFontScale(1.15f);
+
+        Label statsLabel = new Label(cura > 0 ? ("HP: " + hp + " | Cura: " + cura) : ("HP: " + hp + " | Dano: " + dano), skin, "small");
+
+        Label descLabel = new Label(desc, skin, "small");
+        descLabel.setWrap(true);
+
+        textTable.add(nameLabel).left().padBottom(3).row();
+        textTable.add(statsLabel).left().padBottom(3).row();
+
+        textTable.add(descLabel).left().expandX().fillX();
+
+        detailsCard.add(img).size(80, 80).padLeft(20).padRight(20);
+        detailsCard.add(textTable).expandX().fillX().padRight(20);
+    }
+
+
     private void updateFundsDisplay() {
-        fundsLabel.setText("Ouro: " + currentFunds);
+        fundsLabel.setText(String.valueOf(currentFunds));
     }
 
     private Table createEnemyGridPreview() {
@@ -134,7 +219,6 @@ public class PreparationScreen extends BaseScreen {
     }
 
     private void setupDragAndDropTarget(Table cell, final int cellX, final int cellY) {
-        // 1. A CÉLULA COMO RECEPTORA (TARGET)
         dragAndDrop.addTarget(new DragAndDrop.Target(cell) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
@@ -169,7 +253,6 @@ public class PreparationScreen extends BaseScreen {
             }
         });
 
-        // 2. A CÉLULA COMO ORIGEM (SOURCE)
         dragAndDrop.addSource(new DragAndDrop.Source(cell) {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
@@ -224,17 +307,20 @@ public class PreparationScreen extends BaseScreen {
                 updateFundsDisplay();
                 gridManager.removeBattalion(info.originX, info.originY);
             }
-        }); // Erro de sintaxe corrigido aqui!
+        });
 
         return paletteTable;
     }
 
     private TextButton createStartButton() {
-        return UIFactory.createButton("Iniciar Combate", skin, "button_regular", () -> {
+        TextButton btn = UIFactory.createButton("Iniciar Combate", skin, "button_regular", () -> {
             String[][] playerFormation = gridManager.getGridState();
-
             game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid, currentLevel));
         });
+
+        btn.getLabel().setFontScale(0.7f);
+
+        return btn;
     }
 
     private Table createDraggableUnit(final String unitType) {
@@ -243,17 +329,10 @@ public class PreparationScreen extends BaseScreen {
         Image icon = createUnitImage(unitType, GameConfig.UNIT_ICON_SIZE);
         String nomePersonagem;
         switch(unitType) {
-            case "WARRIOR":
-                nomePersonagem = "Soldado";
-                break;
-            case "ARCHER":
-                nomePersonagem = "Arqueiro";
-                break;
-            case "MONK":
-                nomePersonagem = "Monge";
-                break;
-            default:
-                nomePersonagem = "Erro";
+            case "WARRIOR": nomePersonagem = "Soldado"; break;
+            case "ARCHER": nomePersonagem = "Arqueiro"; break;
+            case "MONK": nomePersonagem = "Monge"; break;
+            default: nomePersonagem = "Erro";
         }
 
         dragAndDrop.addSource(new DragAndDrop.Source(icon) {
@@ -275,29 +354,37 @@ public class PreparationScreen extends BaseScreen {
         container.add(icon).size(GameConfig.UNIT_ICON_SIZE).padBottom(-20f).row();
         container.add(label).expandX().fillX();
 
+        // SENSOR DE MOUSE ---
+        container.addListener(new InputListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                // Ao colocar o mouse no container, desenha a carta da tropa
+                updateDetailsCard(unitType);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                // Apenas limpa a tela se o mouse saiu DE FATO para fora do botão
+                // (evita piscar a tela quando o mouse passa por cima do texto do botão)
+                if (toActor == null || !container.isAscendantOf(toActor)) {
+                    updateDetailsCard(null);
+                }
+            }
+        });
+
         return container;
     }
 
     private Image createUnitImage(String unitType, float size) {
         Animation<TextureRegion> anim;
 
-        // Agora escolhemos a animação IDLE de cada personagem
         switch(unitType) {
-            case "WARRIOR":
-                anim = AnimationManager.warriorIdle;
-                break;
-            case "ARCHER":
-                anim = AnimationManager.archerIdle;
-                break;
-            case "MONK":
-                anim = AnimationManager.monkIdle;
-                break;
-            default:
-                anim = AnimationManager.warriorIdle;
-                break;
+            case "WARRIOR": anim = AnimationManager.warriorIdle; break;
+            case "ARCHER":  anim = AnimationManager.archerIdle; break;
+            case "MONK":    anim = AnimationManager.monkIdle; break;
+            default:        anim = AnimationManager.warriorIdle; break;
         }
 
-        // Usa a nossa nova classe animada em vez do Image estático
         AnimatedImage img = new AnimatedImage(anim);
         img.setScaling(Scaling.stretch);
         img.setSize(size, size);
@@ -322,13 +409,11 @@ public class PreparationScreen extends BaseScreen {
         }
     }
 
-    // --- NOVA CLASSE AUXILIAR PARA ANIMAR A UI ---
     private static class AnimatedImage extends Image {
         private final Animation<TextureRegion> animation;
         private float stateTime = 0f;
 
         public AnimatedImage(Animation<TextureRegion> animation) {
-            // Inicia a imagem com o primeiro frame da animação
             super(new TextureRegionDrawable(animation.getKeyFrame(0)));
             this.animation = animation;
         }
@@ -336,7 +421,6 @@ public class PreparationScreen extends BaseScreen {
         @Override
         public void act(float delta) {
             super.act(delta);
-            // O tempo passa e a imagem atualiza a própria textura automaticamente!
             stateTime += delta;
             ((TextureRegionDrawable) getDrawable()).setRegion(animation.getKeyFrame(stateTime, true));
         }
@@ -362,5 +446,7 @@ public class PreparationScreen extends BaseScreen {
     @Override
     public void dispose() {
         stage.dispose();
+        if (backgroundTexture != null) backgroundTexture.dispose();
+        if (coinTexture != null) coinTexture.dispose();
     }
 }
