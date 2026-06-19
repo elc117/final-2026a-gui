@@ -83,3 +83,4 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Melhoramentos nas animações
 * Mudança na quantidade das tropas
 * Mudança na cor da tropa inimiga para vermelho
+* Na PreparationScreen, adicionado card com informações dos personagens ao passar mouse em cima
