@@ -23,9 +23,12 @@ public class CombatScreen extends BaseScreen {
 
     private float stateTime = 0f;
 
-    public CombatScreen(Main game, Skin skin, String[][] playerGrid, String[][] enemyGrid) {
+    private int currentLevel;
+
+    public CombatScreen(Main game, Skin skin, String[][] playerGrid, String[][] enemyGrid, int level) {
         super(game);
         this.skin     = skin;
+        this.currentLevel = level;
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
         this.batch    = new SpriteBatch();
         this.stage    = new Stage(this.viewport);
@@ -63,23 +66,37 @@ public class CombatScreen extends BaseScreen {
 
         String mensagem = isVictory ? "Nível Concluído!" : "Nível Perdido!";
         Label resultLabel = new Label(mensagem, skin, "text_blue_ribbon");
-
         resultLabel.setFontScale(1.4f);
 
-        String textBotao = isVictory ? "Próximo Nível" : "Tentar Novamente";
+        String textBotao;
+        if (isVictory) {
+            if (currentLevel < LevelManager.MAX_LEVEL) {
+                textBotao = "Próximo Nível";
+            } else {
+                textBotao = "Finalizar Jogo";
+            }
+        } else {
+            textBotao = "Tentar Novamente";
+        }
 
         TextButton actionButton = UIFactory.createButton(textBotao, skin, "button_regular", () -> {
             if (isVictory) {
-                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), 2));
+                if (currentLevel < LevelManager.MAX_LEVEL) {
+                    // Soma + 1 e vai para a próxima fase
+                    game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), currentLevel + 1));
+                } else {
+                    // JOGO ZERADO! Retorna ao Menu Principal
+                    game.changeScreen(new MainMenuScreen(game, skin));
+                }
             } else {
-                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), 1));
+                // Derrota: Recarrega a fase atual do zero
+                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), currentLevel));
             }
         });
 
         actionButton.getLabel().setFontScale(0.85f);
 
         overlayTable.add(resultLabel).expand().top().padTop(120).row();
-
         overlayTable.add(actionButton).size(320, 90).expand().bottom().padBottom(100);
 
         stage.addActor(overlayTable);

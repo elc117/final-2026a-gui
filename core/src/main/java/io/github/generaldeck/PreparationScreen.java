@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.graphics.g2d.Animation;
 
 import static com.badlogic.gdx.scenes.scene2d.Touchable.enabled;
 
@@ -231,7 +232,8 @@ public class PreparationScreen extends BaseScreen {
     private TextButton createStartButton() {
         return UIFactory.createButton("Iniciar Combate", skin, "button_regular", () -> {
             String[][] playerFormation = gridManager.getGridState();
-            game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid));
+
+            game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid, currentLevel));
         });
     }
 
@@ -277,26 +279,67 @@ public class PreparationScreen extends BaseScreen {
     }
 
     private Image createUnitImage(String unitType, float size) {
-        Drawable region;
+        Animation<TextureRegion> anim;
+
+        // Agora escolhemos a animação IDLE de cada personagem
         switch(unitType) {
             case "WARRIOR":
-                region = AnimationManager.warriorIcon;
+                anim = AnimationManager.warriorIdle;
                 break;
             case "ARCHER":
-                region = AnimationManager.archerIcon;
+                anim = AnimationManager.archerIdle;
                 break;
             case "MONK":
-                region = AnimationManager.monkIcon;
+                anim = AnimationManager.monkIdle;
                 break;
             default:
-                region = AnimationManager.warriorIcon;
+                anim = AnimationManager.warriorIdle;
                 break;
         }
-        Image img = new Image(region);
+
+        // Usa a nossa nova classe animada em vez do Image estático
+        AnimatedImage img = new AnimatedImage(anim);
         img.setScaling(Scaling.stretch);
         img.setSize(size, size);
         img.setOrigin(size / 2f, size / 2f);
+
         return img;
+    }
+
+    private static class DragInfo {
+        final String unitType;
+        final int originX;
+        final int originY;
+
+        DragInfo(String unitType, int originX, int originY) {
+            this.unitType = unitType;
+            this.originX = originX;
+            this.originY = originY;
+        }
+
+        boolean isFromShop() {
+            return originX == -1 && originY == -1;
+        }
+    }
+
+    // --- NOVA CLASSE AUXILIAR PARA ANIMAR A UI ---
+    private static class AnimatedImage extends Image {
+        private final Animation<TextureRegion> animation;
+        private float stateTime = 0f;
+
+        public AnimatedImage(Animation<TextureRegion> animation) {
+            // Inicia a imagem com o primeiro frame da animação
+            super(new TextureRegionDrawable(animation.getKeyFrame(0)));
+            this.animation = animation;
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            // O tempo passa e a imagem atualiza a própria textura automaticamente!
+            stateTime += delta;
+            ((TextureRegionDrawable) getDrawable()).setRegion(animation.getKeyFrame(stateTime, true));
+        }
     }
 
     @Override
@@ -319,21 +362,5 @@ public class PreparationScreen extends BaseScreen {
     @Override
     public void dispose() {
         stage.dispose();
-    }
-
-    private static class DragInfo {
-        final String unitType;
-        final int originX;
-        final int originY;
-
-        DragInfo(String unitType, int originX, int originY) {
-            this.unitType = unitType;
-            this.originX = originX;
-            this.originY = originY;
-        }
-
-        boolean isFromShop() {
-            return originX == -1 && originY == -1;
-        }
     }
 }

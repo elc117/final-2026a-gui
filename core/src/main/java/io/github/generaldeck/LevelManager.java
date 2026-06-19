@@ -2,17 +2,35 @@ package io.github.generaldeck;
 
 public class LevelManager {
 
-    public static String[][] getEnemyCampaignFormation(int level, int cols, int rows) {
-        String[][] enemyFormation = new String[GameConfig.GRID_ROWS][GameConfig.GRID_COLS];
+    // Define o fim do jogo!
+    public static final int MAX_LEVEL = 3;
 
-        // configura as tropas do inimigo dependendo do nível
-        // precisa achar um jeito de fazer as cartas e builds também
+    public static String[][] getEnemyCampaignFormation(int level, int cols, int rows) {
+        String[][] enemyFormation = new String[cols][rows];
+
+        // Lógica de progressão: Fases mais avançadas = Inimigos mais fortes/posicionados de forma tática
         switch(level) {
             case 1:
+                // Fase 1: Bem fácil, apenas dois soldados para o jogador aprender a jogar
                 enemyFormation[cols - 1][rows / 2] = "WARRIOR";
+                enemyFormation[cols - 1][(rows / 2) + 1] = "WARRIOR";
+                break;
+            case 2:
+                // Fase 2: Introdução aos Arqueiros na retaguarda
+                enemyFormation[cols - 1][rows / 2] = "WARRIOR";
+                enemyFormation[cols - 1][(rows / 2) - 1] = "WARRIOR";
                 enemyFormation[cols - 2][rows / 2] = "ARCHER";
                 break;
+            case 3:
+                // Fase 3: O desafio real (Soldados, Arqueiros e Monge)
+                enemyFormation[cols - 1][rows / 2] = "WARRIOR";
+                enemyFormation[cols - 1][(rows / 2) + 1] = "WARRIOR";
+                enemyFormation[cols - 1][(rows / 2) - 1] = "WARRIOR";
+                enemyFormation[cols - 2][rows / 2] = "ARCHER";
+                enemyFormation[cols - 2][(rows / 2) - 1] = "MONK";
+                break;
             default:
+                // Fallback de segurança
                 enemyFormation[2][2] = "WARRIOR";
                 break;
         }
@@ -23,7 +41,8 @@ public class LevelManager {
         switch(level) {
             case 1:  return 300;
             case 2:  return 500;
-            default: return 200; // Orçamento base de segurança
+            case 3:  return 750; // Mais dinheiro para enfrentar a pedreira final
+            default: return 300;
         }
     }
 }
