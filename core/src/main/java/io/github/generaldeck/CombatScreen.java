@@ -21,7 +21,6 @@ public class CombatScreen extends BaseScreen {
     private float stateTime = 0f;
     private int currentLevel;
 
-    // --- NOVAS VARIÁVEIS DE CONTROLO DE TEMPO ---
     private boolean isPaused = false;
     private boolean isFastForward = false;
     private boolean isGameOver = false;
@@ -41,19 +40,16 @@ public class CombatScreen extends BaseScreen {
     }
 
     private void buildUI() {
-        // --- CAMADA INFERIOR (BOTÕES DE AÇÃO) ---
         Table overlayTable = new Table();
         overlayTable.setFillParent(true);
-        overlayTable.bottom(); // Alinha ao fundo do ecrã
+        overlayTable.bottom();
 
-        // 1. Botão Desistir
         TextButton retreatButton = UIFactory.createButton("Desistir", skin, "button_regular", () -> {
             Gdx.app.log("CombatScreen", "Jogador desistiu");
             game.changeScreen(new MainMenuScreen(game, skin));
         });
         retreatButton.getLabel().setFontScale(0.7f);
 
-        // 2. Botão Velocidade 2x
         TextButton[] speedBtn = new TextButton[1];
         speedBtn[0] = UIFactory.createButton("Vel: 1x", skin, "button_regular", () -> {
             if (!isGameOver) {
@@ -63,7 +59,6 @@ public class CombatScreen extends BaseScreen {
         });
         speedBtn[0].getLabel().setFontScale(0.7f);
 
-        // 3. Botão Pausa
         TextButton[] pauseBtn = new TextButton[1];
         pauseBtn[0] = UIFactory.createButton("Pausar", skin, "button_regular", () -> {
             if (!isGameOver) {
@@ -73,7 +68,6 @@ public class CombatScreen extends BaseScreen {
         });
         pauseBtn[0].getLabel().setFontScale(0.7f);
 
-        // Monta a barra inferior
         overlayTable.add(retreatButton).size(150, 55).padBottom(20).padLeft(20).left();
         overlayTable.add().expandX();
         overlayTable.add(speedBtn[0]).size(130, 55).padBottom(20).padRight(15).right();
@@ -81,22 +75,18 @@ public class CombatScreen extends BaseScreen {
 
         stage.addActor(overlayTable);
 
-        // --- NOVA CAMADA SUPERIOR (HUD DO NÍVEL) ---
         Table topTable = new Table();
         topTable.setFillParent(true);
-        topTable.top(); // Fixa esta tabela no topo da tela
+        topTable.top();
 
-        // Cria a caixinha de madeira
         Table levelBox = new Table();
         levelBox.setBackground(skin.get("button_regular", TextButton.TextButtonStyle.class).up);
-        levelBox.pad(8f).padLeft(20f).padRight(20f); // Dá um respiro para o texto não ficar esmagado
+        levelBox.pad(8f).padLeft(20f).padRight(20f);
 
-        // Cria o texto pequeno e legível
         Label levelLabel = new Label("Nível " + currentLevel, skin, "small");
 
         levelBox.add(levelLabel);
 
-        // Adiciona a caixinha ao centro do topo com um pequeno espaço da borda
         topTable.add(levelBox).padTop(20);
 
         stage.addActor(topTable);
@@ -113,10 +103,7 @@ public class CombatScreen extends BaseScreen {
 
         viewport.apply();
 
-        // --- A MÁGICA DO CONTROLO DE TEMPO ---
-        // Se não estiver em pausa e o jogo não tiver acabado, a simulação avança!
         if (!isPaused && !isGameOver) {
-            // Se o botão 2x estiver ativo, a matemática avança o dobro de tempo por frame
             float timeStep = isFastForward ? delta * 2.0f : delta;
 
             stateTime += timeStep;
@@ -128,13 +115,10 @@ public class CombatScreen extends BaseScreen {
 
         batch.draw(AnimationManager.battleBackground, 0, 0, GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
 
-        // Desenhamos as unidades com o stateTime. Como ele não aumenta no pause,
-        // as animações congelam exatamente no frame em que estavam!
         battalionManager.render(batch, stateTime);
 
         batch.end();
 
-        // --- CHECAGEM DE FIM DE JOGO ---
         if (!isGameOver && !isPaused) {
             if (battalionManager.isTeamDead(1)) {
                 isGameOver = true;
@@ -145,8 +129,6 @@ public class CombatScreen extends BaseScreen {
             }
         }
 
-        // A interface UI atualiza independente do jogo estar em pausa,
-        // permitindo que o jogador clique nos botões!
         stage.act(delta);
         stage.draw();
     }
