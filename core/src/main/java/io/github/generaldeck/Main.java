@@ -28,6 +28,8 @@ public class Main extends Game {
         Cursor cursorPersonalizado = Gdx.graphics.newCursor(pixmap, xHotspot, yHotspot);
         Gdx.graphics.setCursor(cursorPersonalizado);
 
+        pixmap.dispose();
+
         this.setScreen(new MainMenuScreen(this, skin));
     }
 

@@ -3,8 +3,8 @@
 # Auto-Battler (Trabalho Final)
 
 ### Coisas para fazer (ordem de prioridade):
-1. Sistema de dinheiro (jogador precisa comprar as tropas, limite de dinheiro por nível)
-2. Refatorar o código implementar mais unidades
+1. ~~Sistema de dinheiro (jogador precisa comprar as tropas, limite de dinheiro por nível)~~
+2. ~~Refatorar o código implementar mais unidades (IMPLEMENTADO)~~
 3. Unidades diferentes (mago, healer, ladino, etc)
 4. Unidades serem spawnadas em formações diferentes (ex: arqueiro nascem em linha, guerreiros nascem em blocos)
 5. Time inimigo com cor oposta (no tinyswords tem a mesma sprite mas vermelha)
@@ -70,5 +70,9 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 **O que foi feito:**
 * Terminando de criar as interfaces
 * Começando a deixar o jogo mais divertido de jogar
-* 
+* Refatorando para conseguirmos adicionar mais unidades
 
+## Progresso 18/06
+**O que foi feito:**
+* Adicionado sistema de economia
+* Adicionado cursor customizado

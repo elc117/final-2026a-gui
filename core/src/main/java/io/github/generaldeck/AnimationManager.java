@@ -11,6 +11,7 @@ public class AnimationManager {
     // Guerreiro
     public static Animation<TextureRegion> warriorRun;
     public static Animation<TextureRegion> warriorAttack;
+    public static Animation<TextureRegion> warriorAttack_alt;
     public static TextureRegionDrawable warriorIcon;
 
     // Arqueiro
@@ -23,6 +24,7 @@ public class AnimationManager {
 
     private static Texture warriorRunSheet;
     private static Texture warriorAttackSheet;
+    private static Texture warriorAttackSheet2;
     private static Texture archerRunSheet;
     private static Texture archerShootSheet;
     private static Texture arrowSheet;
@@ -32,14 +34,11 @@ public class AnimationManager {
 
         warriorRunSheet = new Texture("Warrior_Run.png");
         warriorAttackSheet = new Texture("Warrior_Attack1.png");
+        warriorAttackSheet2 = new Texture("Warrior_Attack2.png");
         archerRunSheet  = new Texture("Archer_Run.png");
         archerShootSheet = new Texture("Archer_Shoot.png");
         battleBackground = new Texture("Background_Combate.png");
         arrowSheet = new Texture("Arrow.png");
-
-        // Log para depurar tamanho real das sheets
-        Gdx.app.log("AnimationManager", "Warrior: " + warriorRunSheet.getWidth() + "x" + warriorRunSheet.getHeight());
-        Gdx.app.log("AnimationManager", "Archer:  " + archerRunSheet.getWidth()  + "x" + archerRunSheet.getHeight());
 
         int WARRIOR_RUN_FRAMES = 6;
         int WARRIOR_ATK_FRAMES = 4;
@@ -54,10 +53,16 @@ public class AnimationManager {
         warriorRun = new Animation<>(0.1f, wrFrames[0]);
         warriorRun.setPlayMode(Animation.PlayMode.LOOP);
 
-        // WARRIOR ATTACK
+        // WARRIOR ATTACK 1
         TextureRegion[][] waFrames = TextureRegion.split(warriorAttackSheet,
             warriorAttackSheet.getWidth() / WARRIOR_ATK_FRAMES, warriorAttackSheet.getHeight());
         warriorAttack = new Animation<>(0.2f, waFrames[0]);
+        warriorAttack.setPlayMode(Animation.PlayMode.NORMAL);
+
+        // WARRIOR ATTACK 2
+        TextureRegion[][] wa2Frames = TextureRegion.split(warriorAttackSheet2,
+            warriorAttackSheet2.getWidth() / WARRIOR_ATK_FRAMES, warriorAttackSheet2.getHeight());
+        warriorAttack_alt = new Animation<>(0.2f, wa2Frames[0]);
         warriorAttack.setPlayMode(Animation.PlayMode.NORMAL);
 
         // ARCHER RUN
@@ -83,13 +88,17 @@ public class AnimationManager {
     public static void dispose() {
         if (warriorRunSheet != null) warriorRunSheet.dispose();
         if (warriorAttackSheet != null) warriorAttackSheet.dispose();
+        if (warriorAttackSheet2 != null) warriorAttackSheet2.dispose();
         if (archerRunSheet != null) archerRunSheet.dispose();
         if (archerShootSheet != null) archerShootSheet.dispose();
         if (battleBackground != null) battleBackground.dispose();
         if (arrowSheet != null) arrowSheet.dispose();
 
         warriorRunSheet = null;
+        warriorAttackSheet = null;
+        warriorAttackSheet2 = null;
         archerRunSheet = null;
+        archerShootSheet = null;
         battleBackground = null;
     }
 }

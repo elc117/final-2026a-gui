@@ -314,6 +314,8 @@ public class BattalionManager {
                 unit.attackLockTimer = unit.attackDuration;
                 unit.attackTimer = unit.attackCooldown;
 
+                unit.useAlternateAttack = MathUtils.randomBoolean();
+
                 if (unit.isRanged) {
                     spawnProjectile(unit, target);
                 } else {
@@ -397,7 +399,11 @@ public class BattalionManager {
                     anim = unit.isAttacking ? AnimationManager.archerShoot : AnimationManager.archerRun;
                     break;
                 case "WARRIOR":
-                    anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;
+                    if(unit.isAttacking) {
+                        anim = unit.useAlternateAttack ? AnimationManager.warriorAttack_alt : AnimationManager.warriorAttack;
+                    } else {
+                        anim = AnimationManager.warriorRun;
+                    }
                     break;
                 default:
                     anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;

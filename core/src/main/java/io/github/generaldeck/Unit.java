@@ -26,6 +26,7 @@ public class Unit implements Pool.Poolable {
     public float attackDuration;
     public float attackLockTimer = 0f;
     public boolean isRanged;
+    public boolean useAlternateAttack = false;
 
     public void setToWarrior(int team, float x, float y) {
         this.type            = "WARRIOR";
@@ -86,6 +87,7 @@ public class Unit implements Pool.Poolable {
         isAttacking      = false;
         animTime         = 0f;
         attackLockTimer  = 0f;
+        useAlternateAttack = false;
     }
 
     public static int getCost(String type) {

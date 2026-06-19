@@ -77,7 +77,7 @@ public class PreparationScreen extends BaseScreen {
         rootTable.add(startButton).padTop(GameConfig.PAD_DEFAULT).padBottom(GameConfig.PAD_DEFAULT).row();
     }
 
-    // Método corrigido: movido para fora do buildUI()
+    // Méto\do corrigido: movido para fora do buildUI()
     private void updateFundsDisplay() {
         fundsLabel.setText("Ouro: " + currentFunds);
     }
