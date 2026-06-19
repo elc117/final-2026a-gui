@@ -36,6 +36,9 @@ public class BattalionManager {
             case "WARRIOR":
                 unit.setToWarrior(team, x, y);
                 break;
+            case "MONK":
+                unit.setToMonk(team, x, y);
+                break;
             default:
                 Gdx.app.error("Spawns", "Tipo de unidade desconhecido: " + type);
                 unitPool.free(unit);
@@ -81,6 +84,16 @@ public class BattalionManager {
                 }
             }
 
+            // ATUALIZAÇÃO DO TEMPO DA ANIMAÇÃO DE CURA NO ALVO
+            if (unit.isReceivingHeal) {
+                unit.healEffectAnimTime += delta;
+                // Se a animação das estrelinhas acabou, desliga a flag
+                if (unit.healEffectAnimTime >= AnimationManager.monkHealEffect.getAnimationDuration()) {
+                    unit.isReceivingHeal = false;
+                    unit.healEffectAnimTime = 0f;
+                }
+            }
+
             if (unit.isAttacking) {
                 unit.attackLockTimer -= delta;
                 unit.velocity.setZero();
@@ -91,20 +104,23 @@ public class BattalionManager {
                 unit.isAttacking = false;
             }
 
-            // máquina de estados
-            switch (unit.currentBehavior) {
-                case SEEK_CLOSEST:
-                    processCombatAndMovement(unit, findClosestEnemy(unit), false);
-                    break;
-                case SEEK_LOWEST_HP:
-                    processCombatAndMovement(unit, findLowestHpEnemy(unit), false);
-                    break;
-                case FLEE:
-                    processCombatAndMovement(unit, findClosestEnemy(unit), true);
-                    break;
-                default:
-                    unit.velocity.setZero();
-                    break;
+            if (unit.isHealer) {
+                processHealerLogic(unit);
+            } else {
+                switch (unit.currentBehavior) {
+                    case SEEK_CLOSEST:
+                        processCombatAndMovement(unit, findClosestEnemy(unit), false);
+                        break;
+                    case SEEK_LOWEST_HP:
+                        processCombatAndMovement(unit, findLowestHpEnemy(unit), false);
+                        break;
+                    case FLEE:
+                        processCombatAndMovement(unit, findClosestEnemy(unit), true);
+                        break;
+                    default:
+                        unit.velocity.setZero();
+                        break;
+                }
             }
 
             applySeparationMath(unit);
@@ -125,22 +141,15 @@ public class BattalionManager {
             proj.position.x += proj.direction.x * proj.speed * delta;
             proj.position.y += proj.direction.y * proj.speed * delta;
 
-            // exclui flecha caso saia do limite da tela
             if (proj.position.x < 0 || proj.position.x > GameConfig.V_WIDTH ||
                 proj.position.y < 0 || proj.position.y > GameConfig.V_HEIGHT) {
-
-                // CÂMARA 2
-                //Gdx.app.log("DEBUG", "Flecha DESTRUÍDA por sair da tela! PosX: " + proj.position.x);
-
                 activeProjectiles.removeIndex(i);
                 projectilePool.free(proj);
-                continue; // Próxima flecha
+                continue;
             }
 
             boolean hitSomebody = false;
-
             float radius = GameConfig.SPRITE_DRAW_SIZE / 3f;
-
             float hitRadiusSq = radius * radius;
 
             for (int j = 0; j < activeUnits.size; j++) {
@@ -154,7 +163,6 @@ public class BattalionManager {
 
                 if (distSq <= hitRadiusSq) {
                     applyDamage(potentialTarget, proj.damage);
-
                     hitSomebody = true;
                     break;
                 }
@@ -167,6 +175,77 @@ public class BattalionManager {
         }
     }
 
+    private Unit findLowestHpAlly(Unit healer) {
+        Unit bestTarget = null;
+        float lowestHpRatio = 1.0f;
+        float minDistanceSq = Float.MAX_VALUE;
+
+        for (int i = 0; i < activeUnits.size; i++) {
+            Unit other = activeUnits.get(i);
+
+            if (other.isDead || other.team != healer.team || other == healer) continue;
+
+            float hpRatio = other.currentHp / other.maxHp;
+            float dx = other.position.x - healer.position.x;
+            float dy = other.position.y - healer.position.y;
+            float distSq = dx * dx + dy * dy;
+
+            if (hpRatio < 1.0f) {
+                if (hpRatio < lowestHpRatio) {
+                    lowestHpRatio = hpRatio;
+                    minDistanceSq = distSq;
+                    bestTarget = other;
+                } else if (hpRatio == lowestHpRatio && distSq < minDistanceSq) {
+                    minDistanceSq = distSq;
+                    bestTarget = other;
+                }
+            } else if (lowestHpRatio == 1.0f) {
+                if (distSq < minDistanceSq) {
+                    minDistanceSq = distSq;
+                    bestTarget = other;
+                }
+            }
+        }
+        return bestTarget;
+    }
+
+    private void processHealerLogic(Unit healer) {
+        Unit target = findLowestHpAlly(healer);
+        if (target == null) {
+            healer.velocity.setZero();
+            return;
+        }
+
+        float dx = target.position.x - healer.position.x;
+        float dy = target.position.y - healer.position.y;
+        float distSq = (dx * dx) + (dy * dy);
+        float rangeSq = healer.attackRange * healer.attackRange;
+
+        if (target.currentHp < target.maxHp && distSq <= rangeSq) {
+            healer.velocity.setZero();
+            healer.facingRight = dx > 0;
+
+            if (healer.attackTimer <= 0) {
+                healer.isAttacking = true;
+                healer.animTime = 0f;
+                healer.attackLockTimer = healer.attackDuration;
+                healer.attackTimer = healer.attackCooldown;
+
+                target.currentHp += healer.healAmount;
+                if (target.currentHp > target.maxHp) target.currentHp = target.maxHp;
+
+                // AVISA O ALVO QUE ELE FOI CURADO PARA EXIBIR A ANIMAÇÃO
+                target.isReceivingHeal = true;
+                target.healEffectAnimTime = 0f;
+            }
+        } else if (target.currentHp == target.maxHp && distSq <= rangeSq * 0.25f) {
+            healer.velocity.setZero();
+            healer.facingRight = dx > 0;
+        } else {
+            applySeekMath(healer, target);
+        }
+    }
+
     private Unit findClosestEnemy(Unit seeker) {
         Unit closest = null;
         float minDistanceSq = Float.MAX_VALUE;
@@ -174,14 +253,10 @@ public class BattalionManager {
         for (int i = 0; i < activeUnits.size; i++) {
             Unit other = activeUnits.get(i);
 
-            // Ignorar aliados e ignorar a si próprio
             if (other.isDead || other.team == seeker.team) continue;
 
-            // Distância em X e Y
             float dx = other.position.x - seeker.position.x;
             float dy = other.position.y - seeker.position.y;
-
-            // Distância ao quadrado (Mais rápido que fazer Math.sqrt)
             float distSq = dx * dx + dy * dy;
 
             if (distSq < minDistanceSq) {
@@ -240,54 +315,41 @@ public class BattalionManager {
 
         for (int i = 0; i < activeUnits.size; i++) {
             Unit other = activeUnits.get(i);
-
-            if (other.team == seeker.team) continue; // Ignora aliados
+            if (other.team == seeker.team) continue;
 
             if (other.currentHp < minHp) {
                 minHp = other.currentHp;
                 lowestHpUnit = other;
             }
         }
-        return lowestHpUnit != null ? lowestHpUnit : findClosestEnemy(seeker); // Fallback caso haja empate/erro
+        return lowestHpUnit != null ? lowestHpUnit : findClosestEnemy(seeker);
     }
 
     private void applySeparationMath(Unit unit) {
         float pushX = 0;
         float pushY = 0;
-
-        // Espaço pessoal da unidade (ex: 20 pixels de raio).
         float separationRadius = 20f;
-        float separationForce = 10f; // O quão forte elas se empurram
+        float separationForce = 10f;
 
         for (int i = 0; i < activeUnits.size; i++) {
             Unit other = activeUnits.get(i);
 
-            // Não faz sentido separarmo-nos de nós próprios!
             if (unit == other) continue;
 
             float dx = unit.position.x - other.position.x;
             float dy = unit.position.y - other.position.y;
-
             float distSq = dx * dx + dy * dy;
 
-            // Se o 'other' estiver dentro do nosso espaço pessoal...
             if (distSq > 0 && distSq < (separationRadius * separationRadius)) {
                 float distance = (float) Math.sqrt(distSq);
-
-                // Quanto mais perto, maior a sobreposição e mais forte é o empurrão!
                 float overlap = separationRadius - distance;
-
-                // Normaliza o vetor de repulsão
                 dx /= distance;
                 dy /= distance;
-
-                // Acumula a força de empurrão
                 pushX += dx * overlap;
                 pushY += dy * overlap;
             }
         }
 
-        // Adiciona a força acumulada de repulsão à velocidade atual da unidade
         unit.velocity.x += pushX * separationForce;
         unit.velocity.y += pushY * separationForce;
     }
@@ -304,7 +366,6 @@ public class BattalionManager {
         float rangeSq = unit.attackRange * unit.attackRange;
 
         if (distSq <= rangeSq && !isFleeing) {
-            // Lógica de combate
             unit.velocity.setZero();
             unit.facingRight = dx > 0;
 
@@ -321,10 +382,8 @@ public class BattalionManager {
                 } else {
                     applyDamage(target, unit.damage);
                 }
-
             }
         } else {
-            // movimento
             if (isFleeing) {
                 applyFleeMath(unit, target);
             } else {
@@ -341,14 +400,11 @@ public class BattalionManager {
         float gridPixelHeight = rows * GameConfig.TILE_SIZE;
 
         float startY = (GameConfig.V_HEIGHT - gridPixelHeight) / 2f;
-
         float screenMargin = GameConfig.V_WIDTH * 0.1f;
 
-        // spawna o JOGADOR (lado esquerdo, não espelhado, time 0)
         float playerStartX = screenMargin;
         parseGridAndSpawnUnits(playerGrid, playerStartX, startY, 0, false);
 
-        // spawna o INIMIGO (lado direito, espelhado, time 1)
         float enemyStartX = GameConfig.V_WIDTH - screenMargin - gridPixelWidth;
         parseGridAndSpawnUnits(enemyGrid, enemyStartX, startY, 1, true);
     }
@@ -362,14 +418,9 @@ public class BattalionManager {
                 String unitType = gridState[x][y];
 
                 if (unitType != null) {
-                    // lógica de espelhamento
                     int effectiveX = isMirrored ? (cols - 1 - x) : x;
-
-                    // Converte a Coordenada da Matriz [X, Y] para Pixels no Mundo
                     float worldX = startX + (effectiveX * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
                     float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
-
-                    // SPAWNA AS UNIDADES
                     spawnSquad(unitType, worldX, worldY, 30, team);
                 }
             }
@@ -378,85 +429,107 @@ public class BattalionManager {
 
     private void spawnSquad(String type, float centerX, float centerY, int count, int team) {
         for (int i = 0; i < count; i++) {
-            // Adiciona uma pequena variação (jitter) para as unidades não nascerem exatamente em cima da outra
             float jitterX = (float) (Math.random() * 100);
             float jitterY = (float) (Math.random() * 100);
-
-            // O Pool entra em ação: Zero alocação de 'new Unit()' no Heap!
             spawnUnit(type, centerX + jitterX, centerY + jitterY, team);
         }
     }
 
     public void render(SpriteBatch batch, float stateTime) {
-        // DESENHA TROPAS
+        // --- CAMADA 1: DESENHA TODAS AS TROPAS PRIMEIRO ---
+        for (int i = 0; i < activeUnits.size; i++) {
+            Unit unit = activeUnits.get(i);
+            Animation<TextureRegion> anim;
+
+            // Descobre se a unidade está andando (velocidade maior que um limite mínimo)
+            boolean isMoving = unit.velocity.len2() >= 25f;
+
+            switch(unit.type) {
+                case "ARCHER":
+                    if (unit.isAttacking) anim = AnimationManager.archerShoot;
+                    else if (isMoving) anim = AnimationManager.archerRun;
+                    else anim = AnimationManager.archerIdle;
+                    break;
+                case "WARRIOR":
+                    if (unit.isAttacking) anim = unit.useAlternateAttack ? AnimationManager.warriorAttack_alt : AnimationManager.warriorAttack;
+                    else if (isMoving) anim = AnimationManager.warriorRun;
+                    else anim = AnimationManager.warriorIdle;
+                    break;
+                case "MONK":
+                    if (unit.isAttacking) anim = AnimationManager.monkHeal;
+                    else if (isMoving) anim = AnimationManager.monkRun;
+                    else anim = AnimationManager.monkIdle;
+                    break;
+                default:
+                    anim = AnimationManager.warriorIdle;
+            }
+
+            TextureRegion frame = anim.getKeyFrame(unit.animTime);
+
+            float drawH = GameConfig.SPRITE_DRAW_SIZE;
+            float ratio = (float) frame.getRegionWidth() / frame.getRegionHeight();
+            float drawW = drawH * ratio;
+
+            float drawX = unit.position.x - (drawW / 2f);
+            float drawY = unit.position.y - (drawH / 2f);
+
+            if (unit.facingRight) {
+                batch.draw(frame, drawX, drawY, drawW, drawH);
+            } else {
+                batch.draw(frame, drawX + drawW, drawY, -drawW, drawH);
+            }
+        }
+
+        // --- CAMADA 2: EFEITOS VISUAIS PARA DESTACAR O EFEITO DE CURA
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
 
-            // Escolhe a animação correta
-            Animation<TextureRegion> anim;
-            switch(unit.type) {
-                case "ARCHER":
-                    anim = unit.isAttacking ? AnimationManager.archerShoot : AnimationManager.archerRun;
-                    break;
-                case "WARRIOR":
-                    if(unit.isAttacking) {
-                        anim = unit.useAlternateAttack ? AnimationManager.warriorAttack_alt : AnimationManager.warriorAttack;
-                    } else {
-                        anim = AnimationManager.warriorRun;
-                    }
-                    break;
-                default:
-                    anim = unit.isAttacking ? AnimationManager.warriorAttack : AnimationManager.warriorRun;
-            }
+            if (unit.isReceivingHeal) {
+                TextureRegion effectFrame = AnimationManager.monkHealEffect.getKeyFrame(unit.healEffectAnimTime);
 
-            TextureRegion frame;
+                float effectRatio = (float) effectFrame.getRegionWidth() / effectFrame.getRegionHeight();
 
-            if (!unit.isAttacking && unit.velocity.len2() < 25f) {
-                frame = anim.getKeyFrames()[0];
-            } else {
-                frame = anim.getKeyFrame(unit.animTime);
-            }
+                float effectH = GameConfig.SPRITE_DRAW_SIZE * 1.2f;
+                float effectW = effectH * effectRatio;
 
-            float drawSize = GameConfig.SPRITE_DRAW_SIZE;
-            float drawX    = unit.position.x - (drawSize / 2f);
-            float drawY    = unit.position.y - (drawSize / 2f);
+                float effectX = unit.position.x - (effectW / 2f);
+                float effectY = unit.position.y - (effectH / 2f) + 10f;
 
-            if (unit.facingRight) {
-                batch.draw(frame, drawX, drawY, drawSize, drawSize);
-            } else {
-                // Espelha horizontalmente invertendo o width
-                batch.draw(frame, drawX + drawSize, drawY, -drawSize, drawSize);
+                batch.draw(effectFrame, effectX, effectY, effectW, effectH);
             }
         }
-        //DESENHA PROJETEIS
+
+        // --- CAMADA 3: DESENHA PROJÉTEIS ---
         if (AnimationManager.arrowIcon != null) {
             TextureRegion arrowTex = AnimationManager.arrowIcon;
-            // dá pra diminuir o tamanho da imagem direto pra ocupar menos memoria
             float w = arrowTex.getRegionWidth() * 0.3f;
             float h = arrowTex.getRegionHeight() * 0.3f;
 
             for (int i = 0; i < activeProjectiles.size; i++) {
                 Projectile proj = activeProjectiles.get(i);
-
                 batch.draw(
                     arrowTex,
-                    proj.position.x - w/2f, proj.position.y - h/2f, // Posição
-                    w/2f, h/2f, // Ponto pivot para girar (Centro da imagem)
-                    w, h,       // Tamanho real
-                    1f, 1f,     // Escala normal
-                    proj.angle  // A mágica: A inclinação calculada lá no momento do disparo!
+                    proj.position.x - w/2f, proj.position.y - h/2f,
+                    w/2f, h/2f, w, h, 1f, 1f, proj.angle
                 );
             }
         }
     }
 
-    // NÃO PRECISA DE OVERRIDE
+    // Retorna 'true' se todas as unidades de um time específico estiverem mortas
+    public boolean isTeamDead(int teamId) {
+        for (int i = 0; i < activeUnits.size; i++) {
+            Unit u = activeUnits.get(i);
+            if (u.team == teamId && !u.isDead) {
+                return false; // Achou alguém vivo, o time ainda não perdeu
+            }
+        }
+        return true; // Ninguém vivo encontrado
+    }
+
     public void dispose() {
-        // esvazia o array de unidade e projeteis ativos
         activeUnits.clear();
         activeProjectiles.clear();
-
-        // esvazia as pool
         unitPool.clear();
         projectilePool.clear();
     }
