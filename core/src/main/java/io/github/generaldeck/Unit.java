@@ -11,6 +11,13 @@ public class Unit implements Pool.Poolable {
     public int     team;
     public float   currentHp, maxHp;
     public float   damage;
+
+    // --- Atributos de Cura (Novos) ---
+    public float   healAmount;
+    public boolean isHealer;
+    public boolean isReceivingHeal = false;
+    public float   healEffectAnimTime = 0f;
+
     public float   moveSpeed;
     public float   attackRange;
     public float   attackCooldown;
@@ -20,13 +27,13 @@ public class Unit implements Pool.Poolable {
     public boolean isDead;
     public UnitBehavior currentBehavior = UnitBehavior.SEEK_CLOSEST;
 
-    public boolean facingRight = true;  // espelha o sprite
-    public boolean isAttacking = false; // escolhe walk vs attack animation
+    public boolean facingRight = true;
+    public boolean isAttacking = false;
+    public boolean useAlternateAttack = false;
     public float   animTime    = 0f;
     public float attackDuration;
     public float attackLockTimer = 0f;
     public boolean isRanged;
-    public boolean useAlternateAttack = false;
 
     public void setToWarrior(int team, float x, float y) {
         this.type            = "WARRIOR";
@@ -44,11 +51,12 @@ public class Unit implements Pool.Poolable {
         this.speedMultiplier = 1.0f;
         this.isDead          = false;
         this.currentBehavior = UnitBehavior.SEEK_CLOSEST;
-        this.facingRight     = (team == 0); // jogador vai pra direita, inimigo pra esquerda
+        this.facingRight     = (team == 0);
         this.isAttacking     = false;
         this.animTime        = 0f;
         this.attackDuration  = 0.8f;
-        this.isRanged = false;
+        this.isRanged        = false;
+        this.isHealer        = false;
     }
 
     public void setToArcher(int team, float x, float y) {
@@ -71,7 +79,33 @@ public class Unit implements Pool.Poolable {
         this.isAttacking     = false;
         this.animTime        = 0f;
         this.attackDuration  = 3.2f;
-        this.isRanged = true;
+        this.isRanged        = true;
+        this.isHealer        = false;
+    }
+
+    public void setToMonk(int team, float x, float y) {
+        this.type            = "MONK";
+        this.team            = team;
+        this.position.set(x, y);
+        this.velocity.setZero();
+        this.maxHp           = 80f;
+        this.currentHp       = maxHp;
+        this.damage          = 0f;
+        this.healAmount      = 25f;
+        this.moveSpeed       = 55f;
+        this.attackRange     = 150f;
+        this.attackCooldown  = 2.0f;
+        this.attackTimer     = 0f;
+        this.effectTimer     = 0f;
+        this.speedMultiplier = 1.0f;
+        this.isDead          = false;
+        this.currentBehavior = UnitBehavior.SEEK_CLOSEST;
+        this.facingRight     = (team == 0);
+        this.isAttacking     = false;
+        this.animTime        = 0f;
+        this.attackDuration  = 1.1f;
+        this.isRanged        = true;
+        this.isHealer        = true;
     }
 
     @Override
@@ -87,14 +121,20 @@ public class Unit implements Pool.Poolable {
         isAttacking      = false;
         animTime         = 0f;
         attackLockTimer  = 0f;
-        useAlternateAttack = false;
+
+        // Limpando flags de cura para evitar bugs visuais se a unidade morrer e for reaproveitada
+        isReceivingHeal  = false;
+        healEffectAnimTime = 0f;
+        healAmount       = 0f;
+        isHealer         = false;
     }
 
     public static int getCost(String type) {
         switch(type) {
             case "WARRIOR": return 100;
             case "ARCHER":  return 150;
-            default:        return 0; // Fallback de segurança
+            case "MONK":    return 120;
+            default:        return 0;
         }
     }
 }

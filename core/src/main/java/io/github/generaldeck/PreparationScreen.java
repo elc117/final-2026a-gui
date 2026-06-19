@@ -206,6 +206,7 @@ public class PreparationScreen extends BaseScreen {
 
         paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(GameConfig.PAD_DEFAULT);
         paletteTable.add(createDraggableUnit("ARCHER")).size(GameConfig.UNIT_ICON_SIZE);
+        paletteTable.add(createDraggableUnit("MONK")).size(GameConfig.UNIT_ICON_SIZE);
 
         dragAndDrop.addTarget(new DragAndDrop.Target(paletteTable) {
             @Override
@@ -246,6 +247,9 @@ public class PreparationScreen extends BaseScreen {
             case "ARCHER":
                 nomePersonagem = "Arqueiro";
                 break;
+            case "MONK":
+                nomePersonagem = "Monge";
+                break;
             default:
                 nomePersonagem = "Erro";
         }
@@ -280,6 +284,9 @@ public class PreparationScreen extends BaseScreen {
                 break;
             case "ARCHER":
                 region = AnimationManager.archerIcon;
+                break;
+            case "MONK":
+                region = AnimationManager.monkIcon;
                 break;
             default:
                 region = AnimationManager.warriorIcon;

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 public class CombatScreen extends BaseScreen {
 
@@ -17,6 +18,8 @@ public class CombatScreen extends BaseScreen {
     private final BattalionManager battalionManager;
     private final Stage          stage;
     private final Skin           skin;
+
+    private boolean isGameOver = false;
 
     private float stateTime = 0f;
 
@@ -54,9 +57,37 @@ public class CombatScreen extends BaseScreen {
         Gdx.input.setInputProcessor(stage);
     }
 
+    private void showEndGameUI(boolean isVictory) {
+        Table overlayTable = new Table();
+        overlayTable.setFillParent(true);
+
+        String mensagem = isVictory ? "Nível Concluído!" : "Nível Perdido!";
+        Label resultLabel = new Label(mensagem, skin, "text_blue_ribbon");
+
+        resultLabel.setFontScale(1.4f);
+
+        String textBotao = isVictory ? "Próximo Nível" : "Tentar Novamente";
+
+        TextButton actionButton = UIFactory.createButton(textBotao, skin, "button_regular", () -> {
+            if (isVictory) {
+                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), 2));
+            } else {
+                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), 1));
+            }
+        });
+
+        actionButton.getLabel().setFontScale(0.85f);
+
+        overlayTable.add(resultLabel).expand().top().padTop(120).row();
+
+        overlayTable.add(actionButton).size(320, 90).expand().bottom().padBottom(100);
+
+        stage.addActor(overlayTable);
+    }
+
     @Override
     public void render(float delta) {
-        super.render(delta); // limpa a tela
+        super.render(delta);
 
         viewport.apply();
         stateTime += delta;
@@ -64,21 +95,26 @@ public class CombatScreen extends BaseScreen {
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
 
-        // 1. Desenha o background esticado para cobrir a tela inteira
-        batch.draw(
-            AnimationManager.battleBackground,
-            0, 0,
-            GameConfig.V_WIDTH,
-            GameConfig.V_HEIGHT
-        );
+        batch.draw(AnimationManager.battleBackground, 0, 0, GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
 
-        // 2. Desenha as unidades por cima
         battalionManager.update(delta);
         battalionManager.render(batch, stateTime);
 
         batch.end();
 
-        // 3. UI por cima de tudo
+        // NOVA LÓGICA: Checa as condições de vitória ou derrota se o jogo ainda estiver rolando
+        if (!isGameOver) {
+            if (battalionManager.isTeamDead(1)) {
+                // Time 1 (Inimigos) morreu. Vitória!
+                isGameOver = true;
+                showEndGameUI(true);
+            } else if (battalionManager.isTeamDead(0)) {
+                // Time 0 (Jogador) morreu. Derrota!
+                isGameOver = true;
+                showEndGameUI(false);
+            }
+        }
+
         stage.act(delta);
         stage.draw();
     }
