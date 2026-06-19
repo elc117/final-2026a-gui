@@ -418,10 +418,31 @@ public class BattalionManager {
                 String unitType = gridState[x][y];
 
                 if (unitType != null) {
+                    // lógica de espelhamento
                     int effectiveX = isMirrored ? (cols - 1 - x) : x;
+
+                    // Converte a Coordenada da Matriz [X, Y] para Pixels no Mundo
                     float worldX = startX + (effectiveX * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
                     float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
-                    spawnSquad(unitType, worldX, worldY, 30, team);
+
+                    // --- NOVA LÓGICA DE BALANCEAMENTO TÁTICO ---
+                    int squadSize;
+                    switch(unitType) {
+                        case "WARRIOR":
+                            squadSize = 25; // Linha de frente numerosa
+                            break;
+                        case "ARCHER":
+                            squadSize = 12; // Dano à distância (menor quantidade pelo alto impacto)
+                            break;
+                        case "MONK":
+                            squadSize = 6;  // Curandeiros de elite (evita que o time fique imortal)
+                            break;
+                        default:
+                            squadSize = 10; // Fallback de segurança
+                            break;
+                    }
+
+                    spawnSquad(unitType, worldX, worldY, squadSize, team);
                 }
             }
         }
