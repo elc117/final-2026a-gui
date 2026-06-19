@@ -425,20 +425,19 @@ public class BattalionManager {
                     float worldX = startX + (effectiveX * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
                     float worldY = startY + (y * GameConfig.TILE_SIZE) + (GameConfig.TILE_SIZE / 2f);
 
-                    // --- NOVA LÓGICA DE BALANCEAMENTO TÁTICO ---
                     int squadSize;
                     switch(unitType) {
                         case "WARRIOR":
-                            squadSize = 25; // Linha de frente numerosa
+                            squadSize = 25;
                             break;
                         case "ARCHER":
-                            squadSize = 12; // Dano à distância (menor quantidade pelo alto impacto)
+                            squadSize = 12;
                             break;
                         case "MONK":
-                            squadSize = 6;  // Curandeiros de elite (evita que o time fique imortal)
+                            squadSize = 6;
                             break;
                         default:
-                            squadSize = 10; // Fallback de segurança
+                            squadSize = 10;
                             break;
                     }
 
