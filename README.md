@@ -76,3 +76,8 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 **O que foi feito:**
 * Adicionado sistema de economia
 * Adicionado cursor customizado
+
+## Progresso 19/06
+**O que foi feito:**
+* Adicionado novo personagem: **Monge de cura** 
+* Melhoramentos nas animações
