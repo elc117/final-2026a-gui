@@ -18,12 +18,13 @@ import static com.badlogic.gdx.scenes.scene2d.Touchable.enabled;
 
 public class PreparationScreen extends BaseScreen {
     private final Stage stage;
-    // o Scene2D tem um sistema de Drag-and-Drop nativo
     private final DragAndDrop dragAndDrop;
     private final GridManager gridManager;
     private final Skin skin;
     private final String[][] enemyGrid;
     private final int currentLevel;
+    private int currentFunds;
+    private Label fundsLabel;
 
     private Texture backgroundTexture;
 
@@ -32,20 +33,20 @@ public class PreparationScreen extends BaseScreen {
 
         this.stage = new Stage(new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT));
         this.dragAndDrop = new DragAndDrop();
-
-        this.dragAndDrop.setKeepWithinStage(false); // personagem pode vazar para fora da tela
+        this.dragAndDrop.setKeepWithinStage(false);
 
         this.gridManager = gridManager;
         this.skin = skin;
         this.currentLevel = level;
 
         this.enemyGrid = LevelManager.getEnemyCampaignFormation(level, gridManager.getCols(), gridManager.getRows());
+        this.currentFunds = LevelManager.getLevelBudget(level);
 
         buildUI();
     }
 
     private void buildUI() {
-        backgroundTexture = new Texture(Gdx.files.internal("background_preparation.png")); // POR O NEGOCIO AQUI!!!!
+        backgroundTexture = new Texture(Gdx.files.internal("background_preparation.png"));
         Image bgImage = new Image(backgroundTexture);
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
@@ -63,12 +64,22 @@ public class PreparationScreen extends BaseScreen {
         gridsContainer.add(playerGridTable).padRight(50);
         gridsContainer.add(enemyGridTable).padRight(50);
 
+        Table headerTable = new Table();
         Label titleLabel = new Label("Nível " + currentLevel, skin, "text_blue_ribbon");
-        rootTable.add(titleLabel).padBottom(0).row();
+        fundsLabel = new Label("Ouro: " + currentFunds, skin, "text_blue_ribbon");
 
+        headerTable.add(titleLabel).expandX().left().padLeft(GameConfig.PAD_DEFAULT);
+        headerTable.add(fundsLabel).expandX().right().padRight(GameConfig.PAD_DEFAULT);
+
+        rootTable.add(headerTable).fillX().padBottom(GameConfig.PAD_DEFAULT).row();
         rootTable.add(gridsContainer).expand().center().row();
         rootTable.add(paletteTable).padBottom(GameConfig.PAD_DEFAULT).bottom().row();
         rootTable.add(startButton).padTop(GameConfig.PAD_DEFAULT).padBottom(GameConfig.PAD_DEFAULT).row();
+    }
+
+    // Método corrigido: movido para fora do buildUI()
+    private void updateFundsDisplay() {
+        fundsLabel.setText("Ouro: " + currentFunds);
     }
 
     private Table createEnemyGridPreview() {
@@ -76,17 +87,14 @@ public class PreparationScreen extends BaseScreen {
         int cols = enemyGrid.length;
         int rows = enemyGrid[0].length;
 
-        // da pra adicionar isso no skin mais pra frente
         Texture textureTeste = new Texture(Gdx.files.internal("celula_teste_red.png"));
         TextureRegionDrawable cellTeste = new TextureRegionDrawable(new TextureRegion(textureTeste));
 
         for (int y = rows - 1; y >= 0; y--) {
             for (int x = 0; x < cols; x++) {
                 Table cell = new Table();
-
                 cell.setBackground(cellTeste);
 
-                // LÓGICA DE ESPELHAMENTO VISUAL
                 int mirroredX = (cols - 1) - x;
                 String unitType = enemyGrid[mirroredX][y];
 
@@ -102,15 +110,11 @@ public class PreparationScreen extends BaseScreen {
         return table;
     }
 
-
     private Table createGridTable() {
         Table gridTable = new Table();
-        //gridTable.setDebug(true); // MODO DEBUG !!!!
-
         int cols = gridManager.getCols();
         int rows = gridManager.getRows();
 
-        // da pra adicionar isso no skin mais pra frente
         Texture textureTeste = new Texture(Gdx.files.internal("celula_teste.png"));
         TextureRegionDrawable cellTeste = new TextureRegionDrawable(new TextureRegion(textureTeste));
 
@@ -129,25 +133,68 @@ public class PreparationScreen extends BaseScreen {
     }
 
     private void setupDragAndDropTarget(Table cell, final int cellX, final int cellY) {
+        // 1. A CÉLULA COMO RECEPTORA (TARGET)
         dragAndDrop.addTarget(new DragAndDrop.Target(cell) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                DragInfo info = (DragInfo) payload.getObject();
                 String[][] gridState = gridManager.getGridState();
-                return gridState[cellX][cellY] == null;
+
+                if (gridState[cellX][cellY] != null) return false;
+
+                if (info.isFromShop()) {
+                    return currentFunds >= Unit.getCost(info.unitType);
+                }
+                return true;
             }
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                String unitType = (String) payload.getObject();
-                gridManager.placeBattalion(cellX, cellY, unitType);
+                DragInfo info = (DragInfo) payload.getObject();
+
+                if (info.isFromShop()) {
+                    currentFunds -= Unit.getCost(info.unitType);
+                    updateFundsDisplay();
+                } else {
+                    gridManager.removeBattalion(info.originX, info.originY);
+                }
+
+                gridManager.placeBattalion(cellX, cellY, info.unitType);
 
                 Table targetCell = (Table) getActor();
                 targetCell.clearChildren();
-
-                Image placedImage = createUnitImage(unitType, GameConfig.TILE_SIZE);
-                placedImage.setTouchable(Touchable.disabled);
-
+                Image placedImage = createUnitImage(info.unitType, GameConfig.TILE_SIZE);
                 targetCell.add(placedImage).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
+            }
+        });
+
+        // 2. A CÉLULA COMO ORIGEM (SOURCE)
+        dragAndDrop.addSource(new DragAndDrop.Source(cell) {
+            @Override
+            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                String[][] gridState = gridManager.getGridState();
+                String unitType = gridState[cellX][cellY];
+
+                if (unitType == null) return null;
+
+                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                payload.setObject(new DragInfo(unitType, cellX, cellY));
+
+                Image dragImage = createUnitImage(unitType, GameConfig.TILE_SIZE);
+                payload.setDragActor(dragImage);
+                dragAndDrop.setDragActorPosition(GameConfig.TILE_SIZE / 2f, -(GameConfig.TILE_SIZE / 2f));
+
+                cell.clearChildren();
+                return payload;
+            }
+
+            @Override
+            public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+                if (target == null) {
+                    DragInfo info = (DragInfo) payload.getObject();
+                    Image restoredImage = createUnitImage(info.unitType, GameConfig.TILE_SIZE);
+                    cell.add(restoredImage).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
+                }
             }
         });
     }
@@ -159,6 +206,24 @@ public class PreparationScreen extends BaseScreen {
 
         paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(GameConfig.PAD_DEFAULT);
         paletteTable.add(createDraggableUnit("ARCHER")).size(GameConfig.UNIT_ICON_SIZE);
+
+        dragAndDrop.addTarget(new DragAndDrop.Target(paletteTable) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                DragInfo info = (DragInfo) payload.getObject();
+                return !info.isFromShop();
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                DragInfo info = (DragInfo) payload.getObject();
+
+                currentFunds += Unit.getCost(info.unitType);
+                updateFundsDisplay();
+                gridManager.removeBattalion(info.originX, info.originY);
+            }
+        }); // Erro de sintaxe corrigido aqui!
+
         return paletteTable;
     }
 
@@ -189,11 +254,10 @@ public class PreparationScreen extends BaseScreen {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(unitType);
+                payload.setObject(new DragInfo(unitType, -1, -1));
 
                 Image dragImage = createUnitImage(unitType, GameConfig.UNIT_ICON_SIZE);
                 payload.setDragActor(dragImage);
-
                 dragAndDrop.setDragActorPosition(GameConfig.UNIT_ICON_SIZE / 2f, -(GameConfig.UNIT_ICON_SIZE / 2f));
                 return payload;
             }
@@ -236,7 +300,6 @@ public class PreparationScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
-
         stage.act(delta);
         stage.draw();
     }
@@ -250,5 +313,20 @@ public class PreparationScreen extends BaseScreen {
     public void dispose() {
         stage.dispose();
     }
-}
 
+    private static class DragInfo {
+        final String unitType;
+        final int originX;
+        final int originY;
+
+        DragInfo(String unitType, int originX, int originY) {
+            this.unitType = unitType;
+            this.originX = originX;
+            this.originY = originY;
+        }
+
+        boolean isFromShop() {
+            return originX == -1 && originY == -1;
+        }
+    }
+}
