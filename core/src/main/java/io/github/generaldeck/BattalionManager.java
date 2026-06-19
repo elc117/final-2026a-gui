@@ -455,33 +455,54 @@ public class BattalionManager {
         }
     }
 
+    // temos que otimizar esse código, muito ifs aninhados!!!
     public void render(SpriteBatch batch, float stateTime) {
         // --- CAMADA 1: DESENHA TODAS AS TROPAS PRIMEIRO ---
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
             Animation<TextureRegion> anim;
 
-            // Descobre se a unidade está andando (velocidade maior que um limite mínimo)
+            // Verifica se a unidade é um inimigo (Time 1)
+            boolean isEnemy = (unit.team == 1);
             boolean isMoving = unit.velocity.len2() >= 25f;
 
+            // LÓGICA DE SELEÇÃO: AZUL vs VERMELHO
             switch(unit.type) {
                 case "ARCHER":
-                    if (unit.isAttacking) anim = AnimationManager.archerShoot;
-                    else if (isMoving) anim = AnimationManager.archerRun;
-                    else anim = AnimationManager.archerIdle;
+                    if (isEnemy) {
+                        if (unit.isAttacking) anim = AnimationManager.enemyArcherShoot;
+                        else if (isMoving) anim = AnimationManager.enemyArcherRun;
+                        else anim = AnimationManager.enemyArcherIdle;
+                    } else {
+                        if (unit.isAttacking) anim = AnimationManager.archerShoot;
+                        else if (isMoving) anim = AnimationManager.archerRun;
+                        else anim = AnimationManager.archerIdle;
+                    }
                     break;
                 case "WARRIOR":
-                    if (unit.isAttacking) anim = unit.useAlternateAttack ? AnimationManager.warriorAttack_alt : AnimationManager.warriorAttack;
-                    else if (isMoving) anim = AnimationManager.warriorRun;
-                    else anim = AnimationManager.warriorIdle;
+                    if (isEnemy) {
+                        if (unit.isAttacking) anim = unit.useAlternateAttack ? AnimationManager.enemyWarriorAttack_alt : AnimationManager.enemyWarriorAttack;
+                        else if (isMoving) anim = AnimationManager.enemyWarriorRun;
+                        else anim = AnimationManager.enemyWarriorIdle;
+                    } else {
+                        if (unit.isAttacking) anim = unit.useAlternateAttack ? AnimationManager.warriorAttack_alt : AnimationManager.warriorAttack;
+                        else if (isMoving) anim = AnimationManager.warriorRun;
+                        else anim = AnimationManager.warriorIdle;
+                    }
                     break;
                 case "MONK":
-                    if (unit.isAttacking) anim = AnimationManager.monkHeal;
-                    else if (isMoving) anim = AnimationManager.monkRun;
-                    else anim = AnimationManager.monkIdle;
+                    if (isEnemy) {
+                        if (unit.isAttacking) anim = AnimationManager.enemyMonkHeal;
+                        else if (isMoving) anim = AnimationManager.enemyMonkRun;
+                        else anim = AnimationManager.enemyMonkIdle;
+                    } else {
+                        if (unit.isAttacking) anim = AnimationManager.monkHeal;
+                        else if (isMoving) anim = AnimationManager.monkRun;
+                        else anim = AnimationManager.monkIdle;
+                    }
                     break;
                 default:
-                    anim = AnimationManager.warriorIdle;
+                    anim = isEnemy ? AnimationManager.enemyWarriorIdle : AnimationManager.warriorIdle;
             }
 
             TextureRegion frame = anim.getKeyFrame(unit.animTime);
@@ -500,21 +521,17 @@ public class BattalionManager {
             }
         }
 
-        // --- CAMADA 2: EFEITOS VISUAIS PARA DESTACAR O EFEITO DE CURA
+        // --- CAMADA 2: EFEITOS VISUAIS ---
         for (int i = 0; i < activeUnits.size; i++) {
             Unit unit = activeUnits.get(i);
 
             if (unit.isReceivingHeal) {
                 TextureRegion effectFrame = AnimationManager.monkHealEffect.getKeyFrame(unit.healEffectAnimTime);
-
                 float effectRatio = (float) effectFrame.getRegionWidth() / effectFrame.getRegionHeight();
-
                 float effectH = GameConfig.SPRITE_DRAW_SIZE * 1.2f;
                 float effectW = effectH * effectRatio;
-
                 float effectX = unit.position.x - (effectW / 2f);
                 float effectY = unit.position.y - (effectH / 2f) + 10f;
-
                 batch.draw(effectFrame, effectX, effectY, effectW, effectH);
             }
         }

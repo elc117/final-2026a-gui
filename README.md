@@ -7,7 +7,7 @@
 2. ~~Refatorar o código implementar mais unidades (IMPLEMENTADO)~~
 3. Unidades diferentes (mago, healer, ladino, etc)
 4. Unidades serem spawnadas em formações diferentes (ex: arqueiro nascem em linha, guerreiros nascem em blocos)
-5. Time inimigo com cor oposta (no tinyswords tem a mesma sprite mas vermelha)
+5. ~~Time inimigo com cor oposta (no tinyswords tem a mesma sprite mas vermelha)~~
 6. CARTAS DE HABILIDADE!!! Que mudam o comportamento das tropas, dano, efeitos
 7. Adição de efeitos visuais para as cartas, como unidades em chama, congeladas, fugindo.
 8. Sistema para avanço de nível
@@ -82,3 +82,4 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Adicionado novo personagem: **Monge de cura** 
 * Melhoramentos nas animações
 * Mudança na quantidade das tropas
+* Mudança na cor da tropa inimiga para vermelho
