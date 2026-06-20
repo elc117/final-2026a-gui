@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 import static com.badlogic.gdx.scenes.scene2d.Touchable.enabled;
 
@@ -27,6 +28,7 @@ public class PreparationScreen extends BaseScreen {
     private int currentFunds;
     private Label fundsLabel;
     private Texture coinTexture;
+    private TextButton startButton;
 
     private Table detailsCard;
 
@@ -62,7 +64,7 @@ public class PreparationScreen extends BaseScreen {
         Table playerGridTable = createGridTable();
         Table enemyGridTable = createEnemyGridPreview();
         Table paletteTable = createPaletteTable();
-        TextButton startButton = createStartButton();
+        startButton = createStartButton();
 
         Table gridsContainer = new Table();
         gridsContainer.add(playerGridTable).padRight(50);
@@ -114,6 +116,7 @@ public class PreparationScreen extends BaseScreen {
         overlayTable.add(startButton).size(240, 75).padBottom(30).padRight(30).right();
 
         stage.addActor(overlayTable);
+        updateStartButtonState();
     }
 
     private void updateDetailsCard(String unitType) {
@@ -259,6 +262,8 @@ public class PreparationScreen extends BaseScreen {
                 targetCell.clearChildren();
                 Image placedImage = createUnitImage(info.unitType, GameConfig.TILE_SIZE);
                 targetCell.add(placedImage).size(GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
+
+                updateStartButtonState();
             }
         });
 
@@ -315,6 +320,8 @@ public class PreparationScreen extends BaseScreen {
                 currentFunds += Unit.getCost(info.unitType);
                 updateFundsDisplay();
                 gridManager.removeBattalion(info.originX, info.originY);
+
+                updateStartButtonState();
             }
         });
 
@@ -432,6 +439,30 @@ public class PreparationScreen extends BaseScreen {
             super.act(delta);
             stateTime += delta;
             ((TextureRegionDrawable) getDrawable()).setRegion(animation.getKeyFrame(stateTime, true));
+        }
+    }
+
+    private boolean hasPlayerPlacedUnits() {
+        String[][] gridState = gridManager.getGridState();
+        for (int x = 0; x < gridState.length; x++) {
+            for (int y = 0; y < gridState[x].length; y++) {
+                if (gridState[x][y] != null) {
+                    return true; // Encontrou pelo menos um personagem!
+                }
+            }
+        }
+        return false; // Tabuleiro está vazio
+    }
+
+    private void updateStartButtonState() {
+        if (startButton == null) return;
+
+        if (hasPlayerPlacedUnits()) {
+            startButton.setTouchable(Touchable.enabled);
+            startButton.getColor().a = 1.0f; // 100% visível
+        } else {
+            startButton.setTouchable(Touchable.disabled);
+            startButton.getColor().a = 0.5f; // 50% transparente (bloqueado)
         }
     }
 
