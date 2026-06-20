@@ -21,9 +21,10 @@ public class SelectLevelScreen extends BaseScreen {
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
         this.stage = new Stage(this.viewport);
 
-        backgroundTexture = new Texture(Gdx.files.internal("Background_Combate.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("game_background_4_corte_menu_principal.png"));
         Image backgroundImage = new Image(backgroundTexture);
         backgroundImage.setFillParent(true);
+        backgroundImage.setColor(0.4f, 0.4f, 0.4f, 1f);
         this.stage.addActor(backgroundImage);
 
         buildUI(skin);

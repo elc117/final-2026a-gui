@@ -1,70 +1,58 @@
 package io.github.generaldeck;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-/** First screen of the application. Displayed after the application is created. */
 public class MainMenuScreen extends BaseScreen {
 
     private final Stage stage;
     private final FitViewport viewport;
     private Texture backgroundTexture;
 
-    // Skin é o repositório central de estilos e recursos da UI
-    // vamos criar um arquivo depois que vai funcionar como se fosse um stylesheet CSS
-    // para ditar o estilo dos botões do jogo
     public MainMenuScreen(Main game, Skin skin) {
         super(game);
-
-        // resolução base interna do jogo, FitViewport adiciona barras pretas
-        // caso a proporção do navegador seja diferente
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
         this.stage = new Stage(this.viewport);
 
-        backgroundTexture = new Texture(Gdx.files.internal("Background_Combate.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("game_background_4_corte_menu_principal.png"));
         Image backgroundImage = new Image(backgroundTexture);
         backgroundImage.setFillParent(true);
         this.stage.addActor(backgroundImage);
 
-        Table table = new Table();
-        table.setFillParent(true);
-        this.stage.addActor(table);
+        buildUI(skin);
+    }
+
+    private void buildUI(Skin skin) {
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        this.stage.addActor(rootTable);
 
         Label titleLabel = new Label("GENERAL DECK", skin, "text_blue_ribbon");
-        Label descLabel = new Label("Essa eh apenas uma versao alpha. Nao representa o resultado final!", skin, "small");
-        Label descLabel2 = new Label("Planejamos implementar mais unidades, niveis e cartas de habilidade.", skin, "small");
+        titleLabel.setFontScale(1.8f);
 
-        // Adiciona à tabela, dá um espaçamento grande em baixo (ex: 60px) e PULA DE LINHA!
-        table.add(titleLabel).padBottom(60f).row();
-        table.add(descLabel).padBottom(30f).row();
-        table.add(descLabel2).padBottom(30f).row();
-
-        // table é um gerenciador de layout dinamico, como se fosse uma tabela mesmo e ai só dizer em que
-        // coluna e linha queremos o botão/elemento
-        table.defaults().padBottom(GameConfig.PAD_DEFAULT);
-
-        // BOTÃO "CAMPAIGN"
-        TextButton campaignButton = UIFactory.createButton("Campaign", skin, "default", () -> {
+        TextButton campaignButton = UIFactory.createButton("Campanha", skin, "button_regular", () -> {
             Gdx.app.log("MainMenu", "Transition to Level Selection");
-
             game.changeScreen(new SelectLevelScreen(game, skin));
         });
-        table.add(campaignButton).row();
 
-        // BOTÃO "MULTIPLAYER"
         TextButton multiplayerButton = UIFactory.createButton("Multiplayer", skin, "button_red", () -> {
             Gdx.app.log("MainMenu", "Transition to Multiplayer");
         });
-        table.add(multiplayerButton).padBottom(0).row();
+        multiplayerButton.getLabel().setFontScale(0.7f);
+
+        Label creditsLabel = new Label("Criado por Guilherme Martini e Guilherme Dapieve", skin, "small");
+        creditsLabel.setFontScale(0.75f);
+        creditsLabel.getColor().a = 1f;
+
+        rootTable.add(titleLabel).padTop(100).padBottom(150).row();
+
+        rootTable.add(campaignButton).size(280, 80).padBottom(20).row();
+        rootTable.add(multiplayerButton).size(280, 80).row();
+
+        rootTable.add(creditsLabel).expand().bottom().padBottom(15);
     }
 
     @Override
@@ -74,27 +62,20 @@ public class MainMenuScreen extends BaseScreen {
 
     @Override
     public void render(float delta) {
-        // "delta" é o tempo desde o ultimo render
-        // é usado para que a velocidade seja sempre a mesma independente do FPS
         super.render(delta);
-
         stage.act(delta);
         stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
         if(width <= 0 || height <= 0) return;
-
         viewport.update(width, height, true);
     }
 
     @Override
     public void dispose() {
         if (stage != null) stage.dispose();
-
         if (backgroundTexture != null) backgroundTexture.dispose();
     }
 }
