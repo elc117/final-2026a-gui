@@ -4,6 +4,8 @@ public class LevelManager {
 
     // Define o fim do jogo!
     public static final int MAX_LEVEL = 3;
+    // Controla qual é o nível máximo que o jogador já alcançou.
+    public static int highestLevelUnlocked = 1;
 
     public static String[][] getEnemyCampaignFormation(int level, int cols, int rows) {
         String[][] enemyFormation = new String[cols][rows];
