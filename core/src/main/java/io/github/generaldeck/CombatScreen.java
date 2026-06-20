@@ -2,6 +2,7 @@ package io.github.generaldeck;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -25,6 +26,8 @@ public class CombatScreen extends BaseScreen {
     private boolean isFastForward = false;
     private boolean isGameOver = false;
 
+    private Texture combatBackgroundTexture;
+
     public CombatScreen(Main game, Skin skin, String[][] playerGrid, String[][] enemyGrid, int level) {
         super(game);
         this.skin = skin;
@@ -35,6 +38,22 @@ public class CombatScreen extends BaseScreen {
 
         this.battalionManager = new BattalionManager();
         battalionManager.spawnArmies(playerGrid, enemyGrid);
+
+        String combatBgFile;
+        switch (currentLevel) {
+            case 1:
+                combatBgFile = "Background_Combate.png";
+                break;
+            case 2:
+                combatBgFile = "Background_Combate2.png";
+                break;
+            case 3:
+                combatBgFile = "Background_Combate3.png";
+                break;
+            default:
+                combatBgFile = "Background_Combate.png";
+        }
+        this.combatBackgroundTexture = new Texture(Gdx.files.internal(combatBgFile));
 
         buildUI();
     }
@@ -113,7 +132,7 @@ public class CombatScreen extends BaseScreen {
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
 
-        batch.draw(AnimationManager.battleBackground, 0, 0, GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
+        batch.draw(combatBackgroundTexture, 0, 0, GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
 
         battalionManager.render(batch, stateTime);
 
@@ -183,5 +202,6 @@ public class CombatScreen extends BaseScreen {
         batch.dispose();
         stage.dispose();
         battalionManager.dispose();
+        if (combatBackgroundTexture != null) combatBackgroundTexture.dispose();
     }
 }

@@ -52,6 +52,22 @@ public class PreparationScreen extends BaseScreen {
     }
 
     private void buildUI() {
+        // --- SISTEMA DINÂMICO DE CENÁRIOS ---
+        String bgFileName;
+        switch (currentLevel) {
+            case 1:
+                bgFileName = "Background_Combate.png";
+                break;
+            case 2:
+                bgFileName = "Background_Combate2.png";
+                break;
+            case 3:
+                bgFileName = "Background_Combate3.png";
+                break;
+            default:
+                bgFileName = "Background_Combate.png";
+        }
+
         backgroundTexture = new Texture(Gdx.files.internal("background_preparation.png"));
         Image bgImage = new Image(backgroundTexture);
         bgImage.setFillParent(true);
