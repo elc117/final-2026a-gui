@@ -5,12 +5,12 @@
 ### Coisas para fazer (ordem de prioridade):
 1. ~~Sistema de dinheiro (jogador precisa comprar as tropas, limite de dinheiro por nível)~~
 2. ~~Refatorar o código implementar mais unidades (IMPLEMENTADO)~~
-3. Unidades diferentes (mago, healer, ladino, etc)
+3. Unidades diferentes (mago, ~~healer~~, ladino, etc)
 4. Unidades serem spawnadas em formações diferentes (ex: arqueiro nascem em linha, guerreiros nascem em blocos)
 5. ~~Time inimigo com cor oposta (no tinyswords tem a mesma sprite mas vermelha)~~
 6. CARTAS DE HABILIDADE!!! Que mudam o comportamento das tropas, dano, efeitos
 7. Adição de efeitos visuais para as cartas, como unidades em chama, congeladas, fugindo.
-8. Sistema para avanço de nível
+8. ~~Sistema para avanço de nível~~
 9. MULTIPLAYER
 
 ## Progresso 08/06
