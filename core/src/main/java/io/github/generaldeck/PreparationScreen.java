@@ -84,7 +84,7 @@ public class PreparationScreen extends BaseScreen {
 
         Table gridsContainer = new Table();
         gridsContainer.add(playerGridTable).padRight(50);
-        gridsContainer.add(enemyGridTable).padRight(50);
+        gridsContainer.add(enemyGridTable);
 
         // O cabeçalho agora fica super limpo, apenas com o título do Nível centralizado
         Table headerTable = new Table();
@@ -316,10 +316,10 @@ public class PreparationScreen extends BaseScreen {
     private Table createPaletteTable() {
         Table paletteTable = new Table();
         Label instLabel = new Label("Arraste as tropas para o tabuleiro:", skin, "small");
-        paletteTable.add(instLabel).colspan(2).row();
+        paletteTable.add(instLabel).colspan(3).padBottom(15f).row();
 
-        paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(GameConfig.PAD_DEFAULT);
-        paletteTable.add(createDraggableUnit("ARCHER")).size(GameConfig.UNIT_ICON_SIZE);
+        paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(40f);
+        paletteTable.add(createDraggableUnit("ARCHER")).size(GameConfig.UNIT_ICON_SIZE).padRight(40f);
         paletteTable.add(createDraggableUnit("MONK")).size(GameConfig.UNIT_ICON_SIZE);
 
         dragAndDrop.addTarget(new DragAndDrop.Target(paletteTable) {
