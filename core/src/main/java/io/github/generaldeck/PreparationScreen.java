@@ -117,7 +117,7 @@ public class PreparationScreen extends BaseScreen {
     }
 
     private void updateDetailsCard(String unitType) {
-        detailsCard.clearChildren();
+        detailsCard.clearChildren(); // Limpa o card atual
 
         if (unitType == null) {
             Label hint = new Label("Passe o mouse sobre uma tropa para ver os detalhes", skin, "small");
@@ -146,23 +146,32 @@ public class PreparationScreen extends BaseScreen {
 
         Table textTable = new Table();
 
-        Label nameLabel = new Label(nome + " (" + custo + " Ouro)", skin, "small");
+        Table titleRow = new Table();
+
+        Label nameLabel = new Label(nome, skin, "small");
         nameLabel.setFontScale(1.15f);
+
+        Image titleCoinImg = new Image(coinTexture);
+
+        Label costLabel = new Label(String.valueOf(custo), skin, "small");
+        costLabel.setFontScale(1.15f);
+
+        titleRow.add(nameLabel).left();
+        titleRow.add(titleCoinImg).size(22, 22).padLeft(8).padRight(5);
+        titleRow.add(costLabel).left();
 
         Label statsLabel = new Label(cura > 0 ? ("HP: " + hp + " | Cura: " + cura) : ("HP: " + hp + " | Dano: " + dano), skin, "small");
 
         Label descLabel = new Label(desc, skin, "small");
         descLabel.setWrap(true);
 
-        textTable.add(nameLabel).left().padBottom(3).row();
+        textTable.add(titleRow).left().padBottom(3).row();
         textTable.add(statsLabel).left().padBottom(3).row();
-
         textTable.add(descLabel).left().expandX().fillX();
 
         detailsCard.add(img).size(80, 80).padLeft(20).padRight(20);
         detailsCard.add(textTable).expandX().fillX().padRight(20);
     }
-
 
     private void updateFundsDisplay() {
         fundsLabel.setText(String.valueOf(currentFunds));
