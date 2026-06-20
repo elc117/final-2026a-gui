@@ -179,7 +179,7 @@ public class PreparationScreen extends BaseScreen {
         titleRow.add(titleCoinImg).size(22, 22).padLeft(8).padRight(5);
         titleRow.add(costLabel).left();
 
-        Label statsLabel = new Label(cura > 0 ? ("HP: " + hp + " | Cura: " + cura) : ("HP: " + hp + " | Dano: " + dano), skin, "small");
+        Label statsLabel = new Label(cura > 0 ? ("vida: " + hp + "    Cura: " + cura) : ("vida: " + hp + "    Dano: " + dano), skin, "small");
 
         Label descLabel = new Label(desc, skin, "small");
         descLabel.setWrap(true);
