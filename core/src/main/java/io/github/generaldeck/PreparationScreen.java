@@ -315,7 +315,7 @@ public class PreparationScreen extends BaseScreen {
 
     private Table createPaletteTable() {
         Table paletteTable = new Table();
-        Label instLabel = new Label("Arraste as tropas para o tabuleiro:", skin, "small");
+        Label instLabel = new Label("Arraste as tropas para o tabuleiro azul:", skin, "small");
         paletteTable.add(instLabel).colspan(3).padBottom(15f).row();
 
         paletteTable.add(createDraggableUnit("WARRIOR")).size(GameConfig.UNIT_ICON_SIZE).padRight(40f);
