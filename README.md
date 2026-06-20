@@ -80,7 +80,8 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 ## Progresso 19/06
 **O que foi feito:**
 * Adicionado novo personagem: **Monge de cura** 
-* Refinamentos nas animações e na interface
+* Refinamentos nas animações
 * Mudança na quantidade das tropas
 * Mudança na cor da tropa inimiga para vermelho
 * Na PreparationScreen, adicionado card com informações dos personagens ao passar mouse em cima
+* Refinamentos nas telas e nos backgrounds
