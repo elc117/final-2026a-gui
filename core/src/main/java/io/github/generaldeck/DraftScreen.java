@@ -2,8 +2,11 @@ package io.github.generaldeck;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -12,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.math.Interpolation;
 
 public class DraftScreen extends BaseScreen {
     private final Stage stage;
@@ -45,18 +49,15 @@ public class DraftScreen extends BaseScreen {
 
         Array<SkillCard> randomCards = CardManager.getRandomCards(3);
 
-        // desenha as cartas na tela
         for (int i = 0; i < randomCards.size; i++) {
             final SkillCard card = randomCards.get(i);
             Drawable cardIcon = card.getIcon();
 
-            // Declarado como final para podermos usar dentro do Actions.run() com segurança
             final CardWidget widget = new CardWidget(card, skin, cardBg, cardIcon);
 
             widget.setTransform(true);
             widget.setOrigin(com.badlogic.gdx.utils.Align.center);
 
-            // --- 1. ANGULAÇÃO SUAVIZADA (LEQUE) ---
             float tempRotation = 0f;
             if (i == 0) tempRotation = 4f;       // Carta da esquerda
             else if (i == 2) tempRotation = -4f; // Carta da direita
@@ -64,61 +65,61 @@ public class DraftScreen extends BaseScreen {
             final float initialRotation = tempRotation;
             widget.setRotation(initialRotation);
 
-            // --- LISTENER DE HOVER E CLIQUE ---
             widget.addListener(new ClickListener() {
                 @Override
-                public void enter(InputEvent event, float x, float y, int pointer, com.badlogic.gdx.scenes.scene2d.Actor fromActor) {
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                     super.enter(event, x, y, pointer, fromActor);
                     if (pointer == -1) {
                         widget.toFront();
                         widget.clearActions();
-                        widget.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel(
-                            com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo(1.4f, 1.4f, 0.15f, com.badlogic.gdx.math.Interpolation.smooth),
-                            com.badlogic.gdx.scenes.scene2d.actions.Actions.rotateTo(0f, 0.15f, com.badlogic.gdx.math.Interpolation.smooth)
+                        widget.addAction(Actions.parallel(
+                            Actions.scaleTo(1.4f, 1.4f, 0.15f, Interpolation.smooth),
+                            Actions.rotateTo(0f, 0.15f, Interpolation.smooth)
                         ));
                     }
                 }
+
                 @Override
-                public void exit(InputEvent event, float x, float y, int pointer, com.badlogic.gdx.scenes.scene2d.Actor toActor) {
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                     super.exit(event, x, y, pointer, toActor);
                     if (pointer == -1) {
                         widget.clearActions();
-                        widget.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel(
-                            com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo(1.0f, 1.0f, 0.2f, com.badlogic.gdx.math.Interpolation.smooth),
-                            com.badlogic.gdx.scenes.scene2d.actions.Actions.rotateTo(initialRotation, 0.2f, com.badlogic.gdx.math.Interpolation.smooth)
+                        widget.addAction(Actions.parallel(
+                            Actions.scaleTo(1.0f, 1.0f, 0.2f, Interpolation.smooth),
+                            Actions.rotateTo(initialRotation, 0.2f, Interpolation.smooth)
                         ));
                     }
                 }
+
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     selecionarCarta(card);
                 }
             });
 
-            // --- 2. ANIMAÇÃO DE DISTRIBUIÇÃO DO BARALHO ---
-            // Deixa a carta completamente transparente (invisível) ao ser criada
             widget.getColor().a = 0f;
+            widget.setTouchable(Touchable.disabled);
 
-            widget.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence(
-                // O "croupier" distribui uma carta a cada 0.2 segundos (0s, 0.2s, 0.4s)
-                com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(i * 0.2f),
-                com.badlogic.gdx.scenes.scene2d.actions.Actions.run(new Runnable() {
+            widget.addAction(Actions.sequence(
+                Actions.delay(i * 0.2f),
+                Actions.run(new Runnable() {
                     @Override
                     public void run() {
-                        // A tabela já calculou o destino exato. Nós salvamos esse valor:
+
                         float targetX = widget.getX();
                         float targetY = widget.getY();
 
-                        // Teleportamos a carta lá para baixo, no meio da tela
-                        widget.setPosition(GameConfig.V_WIDTH / 2f - widget.getWidth() / 2f, -widget.getHeight() - 50f);
-                        widget.getColor().a = 1f; // Revela a carta
-                        widget.setScale(0.5f);    // Faz ela começar menorzinha, dando noção de profundidade
 
-                        // Lança a carta para a posição original que a tabela calculou!
-                        // O Interpolation.swingOut faz ela dar aquela "passadinha" e voltar, como uma mola.
-                        widget.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel(
-                            com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo(targetX, targetY, 0.6f, com.badlogic.gdx.math.Interpolation.swingOut),
-                            com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo(1f, 1f, 0.6f, com.badlogic.gdx.math.Interpolation.swingOut)
+                        widget.setPosition(GameConfig.V_WIDTH / 2f - widget.getWidth() / 2f, -widget.getHeight() - 50f);
+                        widget.getColor().a = 1f;
+                        widget.setScale(0.5f);
+
+                        widget.addAction(Actions.sequence(
+                            Actions.parallel(
+                                Actions.moveTo(targetX, targetY, 0.6f, Interpolation.swingOut),
+                                Actions.scaleTo(1f, 1f, 0.6f, Interpolation.swingOut)
+                            ),
+                            Actions.touchable(Touchable.enabled)
                         ));
                     }
                 })
@@ -144,7 +145,6 @@ public class DraftScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
-        // Limpa a tela (Coloque a sua textura de background se quiser)
         stage.act(delta);
         stage.draw();
     }
