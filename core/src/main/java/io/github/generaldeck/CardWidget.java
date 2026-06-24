@@ -1,3 +1,5 @@
+package io.github.generaldeck;
+
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -10,14 +12,13 @@ public class CardWidget extends Table {
 
     public CardWidget(SkillCard cardData, Skin skin, Drawable cardBackground, Drawable cardIcon) {
 
-        // 1. O Fundo da carta (Um PNG em branco, apenas com a moldura bonita que você desenhar)
         this.setBackground(cardBackground);
 
-        // 2. O Título da Carta (Usando a sua Skin!)
-        Label titleLabel = new Label(cardData.getName(), skin, "title"); // ou "default" se não tiver "title"
+        // Título
+        Label titleLabel = new Label(cardData.getName(), skin, "small");
         titleLabel.setAlignment(Align.center);
 
-        // 3. A Imagem/Ícone da habilidade
+        // Icone
         Image iconImage = new Image(cardIcon);
 
         // 4. A Descrição (A Mágica do Wrap)
@@ -32,10 +33,10 @@ public class CardWidget extends Table {
         // ==========================================
 
         // Adiciona o título, dá um espaço (pad) em cima e pula de linha (row)
-        this.add(titleLabel).padTop(15).expandX().fillX().row();
+        this.add(titleLabel).padTop(5).expandX().fillX().row();
 
         // Adiciona o ícone no meio, com um tamanho fixo (ex: 64x64)
-        this.add(iconImage).size(64, 64).padTop(10).padBottom(10).row();
+        this.add(iconImage).size(128, 128).padTop(10).padBottom(40).row();
 
         // Adiciona o texto descritivo.
         // O width define onde o texto deve começar a quebrar de linha.

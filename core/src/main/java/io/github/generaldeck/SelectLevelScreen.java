@@ -40,7 +40,7 @@ public class SelectLevelScreen extends BaseScreen {
             final int level = i; // Variável final exigida para usar dentro do lambda do botão
 
             TextButton btn = UIFactory.createButton("Nível " + level, skin, "button_regular", () -> {
-                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), level));
+                game.changeScreen(new DraftScreen(game, skin, level));
             });
 
             // --- A LÓGICA DE BLOQUEIO ---

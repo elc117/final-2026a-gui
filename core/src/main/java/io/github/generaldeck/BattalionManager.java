@@ -9,6 +9,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation;
 
 public class BattalionManager {
+    private final ArmyModifiers playerModifiers;
+    private final ArmyModifiers enemyModifiers;
+
+    public BattalionManager(ArmyModifiers playerModifiers, ArmyModifiers enemyModifiers) {
+        this.playerModifiers = playerModifiers;
+        this.enemyModifiers = enemyModifiers;
+    }
 
     private final Pool<Unit> unitPool = new Pool<Unit>() {
         @Override
@@ -29,15 +36,28 @@ public class BattalionManager {
     public void spawnUnit(String type, float x, float y, int team) {
         Unit unit = unitPool.obtain();
 
+        ArmyModifiers activeMods = (team == 0) ? playerModifiers : enemyModifiers;
+
         switch(type) {
             case "ARCHER":
                 unit.setToArcher(team, x, y);
+                // BONUS DE EFEITO DAS CARTAS
+                unit.damage += activeMods.archerBonusDamage;
+                unit.pierceCount = activeMods.archerBonusPierce;
+                unit.onHitEffects.addAll(activeMods.archerOnHitEffects);
                 break;
             case "WARRIOR":
                 unit.setToWarrior(team, x, y);
+                // BONUS DE EFEITO DAS CARTAS
+                unit.damage += activeMods.warriorBonusDamage;
+                unit.maxHp += activeMods.warriorBonusHealth;
+                unit.onHitEffects.addAll(activeMods.warriorOnHitEffects);
                 break;
             case "MONK":
                 unit.setToMonk(team, x, y);
+                // BONUS DE EFEITO DAS CARTAS
+
+                //unit.onHitEffects.addAll(activeMods.monkOnHitEffects);
                 break;
             default:
                 Gdx.app.error("Spawns", "Tipo de unidade desconhecido: " + type);
@@ -45,12 +65,15 @@ public class BattalionManager {
                 return;
         }
 
+        unit.currentHp = unit.maxHp;
+
         activeUnits.add(unit);
     }
 
     private void spawnProjectile(Unit shooter, Unit target) {
         Projectile proj = projectilePool.obtain();
         proj.init(shooter.position.x, shooter.position.y, target.position.x, target.position.y, shooter.damage, shooter.team);
+        proj.pierceCount = shooter.pierceCount;
         activeProjectiles.add(proj);
     }
 
@@ -148,7 +171,7 @@ public class BattalionManager {
                 continue;
             }
 
-            boolean hitSomebody = false;
+            boolean projDestroyed = false;
             float radius = GameConfig.SPRITE_DRAW_SIZE / 3f;
             float hitRadiusSq = radius * radius;
 
@@ -162,13 +185,19 @@ public class BattalionManager {
                 float distSq = (dx * dx) + (dy * dy);
 
                 if (distSq <= hitRadiusSq) {
-                    applyDamage(potentialTarget, proj.damage);
-                    hitSomebody = true;
-                    break;
+                    if (!proj.hitTargets.contains(potentialTarget, true)) {
+                        applyDamage(potentialTarget, proj.damage);
+                        proj.hitTargets.add(potentialTarget);
+                        proj.pierceCount--;
+                    }
+                    if (proj.pierceCount < 0) {
+                        projDestroyed = true;
+                        break;
+                    }
                 }
             }
 
-            if (hitSomebody) {
+            if (projDestroyed) {
                 activeProjectiles.removeIndex(i);
                 projectilePool.free(proj);
             }
