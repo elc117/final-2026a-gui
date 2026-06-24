@@ -85,3 +85,7 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Mudança na cor da tropa inimiga para vermelho
 * Na PreparationScreen, adicionado card com informações dos personagens ao passar mouse em cima
 * Refinamentos nas telas e nos backgrounds
+
+## Progresso 23/06
+**O que foi feito:**
+* Adicionado sistema de cartas de habilidades 
