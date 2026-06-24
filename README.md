@@ -88,6 +88,7 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 
 ### 4. Diagrama de Classes
 <img width="2568" height="7696" alt="generaldeck3" src="https://github.com/user-attachments/assets/61d21e93-4739-45c5-b406-14e9a1bbc2e3" />
+
 *Diagrama gerado utilizando a ferramenta: IntelliJ IDEA
 
 ### 5. Orientações para Execução
