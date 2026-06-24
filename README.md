@@ -1,3 +1,4 @@
+
 # Auto-Battler: General Deck
 
 ### 1. Identificação
@@ -99,6 +100,8 @@ O projeto foi gerado utilizando a ferramenta `gdx-liftoff`. Para rodar o jogo na
 4. Execute a classe `DesktopLauncher.java` localizada no módulo `desktop` (ou `lwjgl3`).
 
 ### 6. Resultado Final
+
+https://github.com/user-attachments/assets/1beabe30-83c7-42e5-a91f-15f5358d8545
 
 
 ### 7. Referências e Créditos
