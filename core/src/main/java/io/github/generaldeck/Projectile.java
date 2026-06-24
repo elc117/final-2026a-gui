@@ -15,6 +15,7 @@ public class Projectile implements Pool.Poolable {
     public boolean isDead = false;
     public int pierceCount = 0;
     public Array<Unit> hitTargets = new Array<>(false, 8);
+    public Unit shooter;
 
     public void init(float startX, float startY, float targetX, float targetY, float damage, int team) {
         this.position.set(startX, startY);
@@ -41,5 +42,7 @@ public class Projectile implements Pool.Poolable {
         this.position.setZero();
         pierceCount = 0;
         hitTargets.clear();
+
+        this.shooter = null;
     }
 }

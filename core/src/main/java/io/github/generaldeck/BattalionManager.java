@@ -74,6 +74,7 @@ public class BattalionManager {
         Projectile proj = projectilePool.obtain();
         proj.init(shooter.position.x, shooter.position.y, target.position.x, target.position.y, shooter.damage, shooter.team);
         proj.pierceCount = shooter.pierceCount;
+        proj.shooter = shooter;
         activeProjectiles.add(proj);
     }
 
@@ -187,6 +188,14 @@ public class BattalionManager {
                 if (distSq <= hitRadiusSq) {
                     if (!proj.hitTargets.contains(potentialTarget, true)) {
                         applyDamage(potentialTarget, proj.damage);
+
+                        if (proj.shooter != null && !proj.shooter.isDead) {
+                            for (int e = 0; e < proj.shooter.onHitEffects.size; e++) {
+                                OnHitEffect effect = proj.shooter.onHitEffects.get(e);
+                                effect.onHit(proj.shooter, potentialTarget);
+                            }
+                        }
+
                         proj.hitTargets.add(potentialTarget);
                         proj.pierceCount--;
                     }
@@ -410,6 +419,10 @@ public class BattalionManager {
                     spawnProjectile(unit, target);
                 } else {
                     applyDamage(target, unit.damage);
+                    for (int i = 0; i < unit.onHitEffects.size; i++) {
+                        OnHitEffect effect = unit.onHitEffects.get(i);
+                        effect.onHit(unit, target);
+                    }
                 }
             }
         } else {
