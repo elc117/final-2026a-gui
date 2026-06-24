@@ -108,3 +108,4 @@ https://github.com/user-attachments/assets/1beabe30-83c7-42e5-a91f-15f5358d8545
 * **Framework:** LibGDX (gerado via `gdx-liftoff`)
 * **Sprites das Tropas e Tilesets:** Pacote "Tiny Swords" criado por Pixel Frog
 * **Cenários de Combate:** Pacote "Free Elven Land 2D Battle Backgrounds" criado por Free Game Assets
+* **Apoio de Inteligência Artificial:** Usamos o Gemini Pro como um tutor e "parceiro de programação". Ele nos ajudou a debater ideias sobre Padrões de Projeto, a arrumar bugs de interface no Scene2D e a organizar melhor a arquitetura do código.
