@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public class Main extends Game {
     private AssetManager assetManager;
     private Skin skin;
+    public ArmyModifiers playerModifiers;
 
     @Override
     public void create() {
@@ -29,6 +30,8 @@ public class Main extends Game {
         Gdx.graphics.setCursor(cursorPersonalizado);
 
         pixmap.dispose();
+
+        playerModifiers = new ArmyModifiers();
 
         this.setScreen(new MainMenuScreen(this, skin));
     }

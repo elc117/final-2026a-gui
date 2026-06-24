@@ -6,7 +6,7 @@ filter: Linear, Linear
 repeat: none
 blue_ribbon
   rotate: false
-  xy: 1223, 1723
+  xy: 1537, 1873
   size: 192, 64
   split: 96, 95, 32, 31
   orig: 192, 64
@@ -14,7 +14,7 @@ blue_ribbon
   index: -1
 button_blue_9p
   rotate: false
-  xy: 1029, 1723
+  xy: 1, 237
   size: 192, 64
   split: 94, 94, 32, 31
   orig: 192, 64
@@ -22,7 +22,7 @@ button_blue_9p
   index: -1
 button_blue_pressed_9p
   rotate: false
-  xy: 1537, 1959
+  xy: 515, 641
   size: 192, 64
   split: 94, 95, 32, 31
   orig: 192, 64
@@ -30,7 +30,7 @@ button_blue_pressed_9p
   index: -1
 button_red_9p
   rotate: false
-  xy: 515, 1274
+  xy: 1029, 1494
   size: 192, 64
   split: 94, 94, 32, 31
   orig: 192, 64
@@ -38,7 +38,7 @@ button_red_9p
   index: -1
 button_red_9p_pressed
   rotate: false
-  xy: 1029, 1657
+  xy: 1230, 1796
   size: 192, 64
   split: 94, 95, 32, 31
   orig: 192, 64
@@ -46,7 +46,7 @@ button_red_9p_pressed
   index: -1
 red_ribbon
   rotate: false
-  xy: 1537, 1893
+  xy: 1731, 1873
   size: 192, 64
   split: 42, 41, 12, 21
   pad: 96, 95, 32, 31
@@ -55,7 +55,7 @@ red_ribbon
   index: -1
 slot
   rotate: false
-  xy: 515, 1080
+  xy: 1, 43
   size: 192, 192
   split: 96, 95, 96, 95
   orig: 192, 192
@@ -63,57 +63,78 @@ slot
   index: -1
 smallburg-Italic
   rotate: false
-  xy: 515, 1340
+  xy: 1, 303
   size: 506, 92
   orig: 506, 92
   offset: 0, 0
   index: -1
 smallburg-Italic(1)_0
   rotate: false
-  xy: 515, 1511
+  xy: 515, 1425
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 smallburg-Italic(1)_1
   rotate: false
-  xy: 1, 483
+  xy: 1, 397
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 smallburg-Regular
   rotate: false
-  xy: 515, 1434
+  xy: 1029, 1862
   size: 506, 75
   orig: 506, 75
   offset: 0, 0
   index: -1
 smallburg-Regular(1)
   rotate: false
-  xy: 1029, 1789
+  xy: 515, 1189
   size: 506, 234
   orig: 506, 234
   offset: 0, 0
   index: -1
 smallburg-Regular(2)
   rotate: false
-  xy: 1, 1
+  xy: 515, 707
   size: 506, 480
   orig: 506, 480
   offset: 0, 0
   index: -1
 smallburg-Regular(3)_0
   rotate: false
-  xy: 1, 1511
+  xy: 1, 1425
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 smallburg-Regular(3)_1
   rotate: false
-  xy: 1, 997
+  xy: 1, 911
   size: 512, 512
   orig: 512, 512
+  offset: 0, 0
+  index: -1
+card_bronze
+  rotate: false
+  xy: 1029, 1560
+  size: 199, 300
+  orig: 199, 300
+  offset: 0, 0
+  index: -1
+card_ouro
+  rotate: false
+  xy: 195, 1
+  size: 192, 300
+  orig: 192, 300
+  offset: 0, 0
+  index: -1
+card_prata
+  rotate: false
+  xy: 515, 360
+  size: 178, 279
+  orig: 178, 279
   offset: 0, 0
   index: -1

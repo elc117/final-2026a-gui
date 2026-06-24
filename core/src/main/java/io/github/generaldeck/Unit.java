@@ -1,8 +1,8 @@
 package io.github.generaldeck;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Array;
 
 public class Unit implements Pool.Poolable {
     public String  type;
@@ -34,6 +34,9 @@ public class Unit implements Pool.Poolable {
     public float attackDuration;
     public float attackLockTimer = 0f;
     public boolean isRanged;
+    public int pierceCount = 0;
+
+    public Array<OnHitEffect> onHitEffects = new Array<>();
 
     public void setToWarrior(int team, float x, float y) {
         this.type            = "WARRIOR";
@@ -121,8 +124,8 @@ public class Unit implements Pool.Poolable {
         isAttacking      = false;
         animTime         = 0f;
         attackLockTimer  = 0f;
+        onHitEffects.clear();
 
-        // Limpando flags de cura para evitar bugs visuais se a unidade morrer e for reaproveitada
         isReceivingHeal  = false;
         healEffectAnimTime = 0f;
         healAmount       = 0f;

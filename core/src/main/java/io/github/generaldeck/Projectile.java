@@ -2,6 +2,7 @@ package io.github.generaldeck;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 public class Projectile implements Pool.Poolable {
@@ -12,6 +13,9 @@ public class Projectile implements Pool.Poolable {
     public float damage;
     public int team;
     public boolean isDead = false;
+    public int pierceCount = 0;
+    public Array<Unit> hitTargets = new Array<>(false, 8);
+    public Unit shooter;
 
     public void init(float startX, float startY, float targetX, float targetY, float damage, int team) {
         this.position.set(startX, startY);
@@ -36,5 +40,9 @@ public class Projectile implements Pool.Poolable {
         this.isDead = false;
         this.direction.setZero();
         this.position.setZero();
+        pierceCount = 0;
+        hitTargets.clear();
+
+        this.shooter = null;
     }
 }

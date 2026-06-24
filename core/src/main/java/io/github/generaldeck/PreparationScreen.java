@@ -148,10 +148,12 @@ public class PreparationScreen extends BaseScreen {
         int custo = Unit.getCost(unitType);
         Animation<TextureRegion> anim = null;
 
+        ArmyModifiers mods = game.playerModifiers;
+
         switch (unitType) {
             case "WARRIOR":
                 nome = "Soldado"; desc = "Infantaria. Alta resistência para a linha de frente.";
-                hp = 140; dano = 10; anim = AnimationManager.warriorIdle; break;
+                hp = 140 + (int)mods.warriorBonusHealth; dano = 10 + (int)mods.warriorBonusDamage; anim = AnimationManager.warriorIdle; break;
             case "ARCHER":
                 nome = "Arqueiro"; desc = "Atirador. Dano massivo, mas frágil.";
                 hp = 70; dano = 15; anim = AnimationManager.archerIdle; break;
@@ -347,7 +349,7 @@ public class PreparationScreen extends BaseScreen {
     private TextButton createStartButton() {
         TextButton btn = UIFactory.createButton("Iniciar Combate", skin, "button_regular", () -> {
             String[][] playerFormation = gridManager.getGridState();
-            game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid, currentLevel));
+            game.changeScreen(new CombatScreen(game, skin, playerFormation, enemyGrid, currentLevel, game.playerModifiers));
         });
 
         btn.getLabel().setFontScale(0.7f);

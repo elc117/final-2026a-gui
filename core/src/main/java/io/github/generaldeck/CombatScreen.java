@@ -26,17 +26,22 @@ public class CombatScreen extends BaseScreen {
     private boolean isFastForward = false;
     private boolean isGameOver = false;
 
+    private ArmyModifiers globalPlayerModifiers;
+    private ArmyModifiers currentEnemyModifiers;
+
     private Texture combatBackgroundTexture;
 
-    public CombatScreen(Main game, Skin skin, String[][] playerGrid, String[][] enemyGrid, int level) {
+    public CombatScreen(Main game, Skin skin, String[][] playerGrid, String[][] enemyGrid, int level, ArmyModifiers playerModifiers) {
         super(game);
         this.skin = skin;
         this.currentLevel = level;
         this.viewport = new FitViewport(GameConfig.V_WIDTH, GameConfig.V_HEIGHT);
         this.batch = new SpriteBatch();
         this.stage = new Stage(this.viewport);
+        this.globalPlayerModifiers = playerModifiers;
+        this.currentEnemyModifiers = new ArmyModifiers();
 
-        this.battalionManager = new BattalionManager();
+        this.battalionManager = new BattalionManager(globalPlayerModifiers, currentEnemyModifiers);
         battalionManager.spawnArmies(playerGrid, enemyGrid);
 
         String combatBgFile;
@@ -174,12 +179,14 @@ public class CombatScreen extends BaseScreen {
         TextButton actionButton = UIFactory.createButton(textBotao, skin, "button_regular", () -> {
             if (isVictory) {
                 if (currentLevel < LevelManager.MAX_LEVEL) {
-                    game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), currentLevel + 1));
+                    game.changeScreen(new DraftScreen(game, skin, currentLevel + 1));
                 } else {
+                    globalPlayerModifiers.reset();
                     game.changeScreen(new MainMenuScreen(game, skin));
                 }
             } else {
-                game.changeScreen(new PreparationScreen(game, skin, new GridManager(5, 5), currentLevel));
+                globalPlayerModifiers.reset();
+                game.changeScreen(new DraftScreen(game, skin, currentLevel));
             }
         });
 
