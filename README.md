@@ -1,17 +1,13 @@
-/![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/8MfjtJ-y)
+# Auto-Battler: General Deck
 
-# Auto-Battler (Trabalho Final)
+### 1. Identificação
+* **Nomes:** Guilherme Martini e Guilherme Dapieve
+* **Curso:** Sistemas de Informação
 
-### Coisas para fazer (ordem de prioridade):
-1. ~~Sistema de dinheiro (jogador precisa comprar as tropas, limite de dinheiro por nível)~~
-2. ~~Refatorar o código implementar mais unidades (IMPLEMENTADO)~~
-3. Unidades diferentes (mago, ~~healer~~, ladino, etc)
-4. Unidades serem spawnadas em formações diferentes (ex: arqueiro nascem em linha, guerreiros nascem em blocos)
-5. ~~Time inimigo com cor oposta (no tinyswords tem a mesma sprite mas vermelha)~~
-6. CARTAS DE HABILIDADE!!! Que mudam o comportamento das tropas, dano, efeitos
-7. Adição de efeitos visuais para as cartas, como unidades em chama, congeladas, fugindo.
-8. ~~Sistema para avanço de nível~~
-9. MULTIPLAYER
+### 2. Proposta
+O projeto é um jogo do gênero "Auto-Battler" desenvolvido em Java utilizando o framework LibGDX. O objetivo do jogo é montar uma estratégia de posicionamento e melhorias de exército. O jogador compra tropas (como Guerreiros, Arqueiros e Monges), aplica cartas de habilidade que alteram atributos ou adicionam efeitos (como Roubo de Vida ou Flechas Perfurantes), e assiste ao combate automatizado contra tropas inimigas que possuem comportamentos independentes de movimentação (flocking/seek).
+
+### 3. Processo de Desenvolvimento
 
 ## Progresso 08/06
 Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisitos de ambiente e as diretrizes de visualização para a web.
@@ -88,4 +84,23 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 
 ## Progresso 23/06
 **O que foi feito:**
-* Adicionado sistema de cartas de habilidades 
+* Adicionado sistema de cartas de habilidades
+
+### 4. Diagrama de Classes
+<img width="2568" height="7696" alt="generaldeck3" src="https://github.com/user-attachments/assets/61d21e93-4739-45c5-b406-14e9a1bbc2e3" />
+*Diagrama gerado utilizando a ferramenta: IntelliJ IDEA
+
+### 5. Orientações para Execução
+O projeto foi gerado utilizando a ferramenta `gdx-liftoff`. Para rodar o jogo na sua máquina local:
+1. Certifique-se de ter o JDK (Java Development Kit) instalado.
+2. Abra a pasta raiz do projeto na sua IDE (IntelliJ IDEA ou Eclipse).
+3. Sincronize o projeto com o Gradle.
+4. Execute a classe `DesktopLauncher.java` localizada no módulo `desktop` (ou `lwjgl3`).
+
+### 6. Resultado Final
+
+
+### 7. Referências e Créditos
+* **Framework:** LibGDX (gerado via `gdx-liftoff`)
+* **Criação de Interface (UI):** Ferramenta SkinManager
+* **Inteligência Artificial de Movimento:** Algoritmos de Flocking e Seek baseados em Craig Reynolds
