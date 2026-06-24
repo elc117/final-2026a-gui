@@ -9,7 +9,7 @@ O projeto é um jogo do gênero "Auto-Battler" desenvolvido em Java utilizando o
 
 ### 3. Processo de Desenvolvimento
 
-## Progresso 08/06
+### Progresso 08/06
 Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisitos de ambiente e as diretrizes de visualização para a web.
 
 **O que foi feito:**
@@ -18,30 +18,30 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Implementação do `FitViewport` (1280x720) para garantir que o campo de batalha mantenha a proporção correta e não sofra distorções quando renderizado no navegador via Itch.io.
 * Criação dos protótipos iniciais das telas de Menu (`MainMenuScreen`), Preparação (`PreparationScreen`) e Combate (`CombatScreen`) com posicionamento preliminar da grid de batalha.
 
-## Progresso 09/06
+### Progresso 09/06
 **O que foi feito:**
 * Criação de uma classe abstrata `BaseScreen` para implementar as outras screens
 * Criação da classe UIFactory para facilitar a criação de botões
 
-## Progresso 10/06
+### Progresso 10/06
 **O que foi feito:**
 * Spawn das unidades na tela `PreparationScreen`
 * Tela de combate renderizando um protótipo das unidades
 * Bugfix para não por unidades no mesmo grid
 
-## Progresso 11/06
+### Progresso 11/06
 **O que foi feito:**
 * Correção do bug de acesso fora da matriz em PreparationScreen.java.
 * Comportamento de flocking baseado em Craig Reynolds
 * Comportamento de seek modular para facilitar o desenvolvimento depois
 
-## Progresso 13/06
+### Progresso 13/06
 **O que foi feito:**
 * Refatoração de alguns códigos muito feios
 * Criação de um sistema de seleção de níveis e criação de inimigos
 * `LevelManager`, `SelectLevelScreen`
 
-## Progresso 14/06
+### Progresso 14/06
 **O que foi feito:**
 * Criada uma classe AnimationManager para carregar as texturas uma única vez quando o jogo abrir, e guardá-las na memória.
 * Adicionado background na tela de combate.
@@ -49,31 +49,31 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Implementado lógica de animação para espelhar o sprite horizontalmente dependendo a direção do movimento.
 * Classe `Projectiles` para as flechas dos arqueiros e magias no futuro
 
-## Progresso 15/06
+### Progresso 15/06
 **O que foi feito:**
 * Começando a prototipar as interfaces
 * Uso do programa SkinManager para fazer uma skin
 * Skin nova para os elementos da UI
 * Prototipação dos menus
 
-## Progresso 16/06
+### Progresso 16/06
 **O que foi feito:**
 * Implementação das interfaces
 * Arrumando alguns erros do código e vazamentos de memória
 * Algumas refatorações
 
-## Progresso 17/06
+### Progresso 17/06
 **O que foi feito:**
 * Terminando de criar as interfaces
 * Começando a deixar o jogo mais divertido de jogar
 * Refatorando para conseguirmos adicionar mais unidades
 
-## Progresso 18/06
+### Progresso 18/06
 **O que foi feito:**
 * Adicionado sistema de economia
 * Adicionado cursor customizado
 
-## Progresso 19/06
+### Progresso 19/06
 **O que foi feito:**
 * Adicionado novo personagem: **Monge de cura** 
 * Refinamentos nas animações
@@ -82,7 +82,7 @@ Nesta etapa inicial, estabelecemos a fundação do projeto cumprindo os requisit
 * Na PreparationScreen, adicionado card com informações dos personagens ao passar mouse em cima
 * Refinamentos nas telas e nos backgrounds
 
-## Progresso 23/06
+### Progresso 23/06
 **O que foi feito:**
 * Adicionado sistema de cartas de habilidades
 
@@ -103,5 +103,5 @@ O projeto foi gerado utilizando a ferramenta `gdx-liftoff`. Para rodar o jogo na
 
 ### 7. Referências e Créditos
 * **Framework:** LibGDX (gerado via `gdx-liftoff`)
-* **Criação de Interface (UI):** Ferramenta SkinManager
-* **Inteligência Artificial de Movimento:** Algoritmos de Flocking e Seek baseados em Craig Reynolds
+* **Sprites das Tropas e Tilesets:** Pacote "Tiny Swords" criado por Pixel Frog
+* **Cenários de Combate:** Pacote "Free Elven Land 2D Battle Backgrounds" criado por Free Game Assets
